@@ -9,9 +9,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -112,30 +114,46 @@ fun MainContent(
     isActive: Boolean = true,
     displayTime: String
 ) {
-    if (!isDeviceAdminActive) {
-        DeviceAdminButton(
-            onRequestAdmin = onRequestAdmin
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+    ) {
+        Text(
+            modifier = Modifier.fillMaxWidth(),
+            text = "Screen Timer",
+            style = MaterialTheme.typography.displayLarge,
+            textAlign = TextAlign.Center
         )
-    } else {
-        Column {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = if (isActive) {
-                    displayTime
-                } else {
-                    displayTime
-                },
-                style = MaterialTheme.typography.displayLarge,
-                textAlign = TextAlign.Center
+        Spacer(modifier = Modifier.size(128.dp))
+        if (!isDeviceAdminActive) {
+            DeviceAdminButton(
+                onRequestAdmin = onRequestAdmin
             )
-
-            NumberPad(
-                onNumberClick = onNumberClick,
-                onRemoveClick = onRemoveClick,
-                onStartClick = onStartClick,
-                onStopClick = onStopClick,
-                isActive = isKeypadActive
-            )
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                verticalArrangement = Arrangement.spacedBy(32.dp)
+            ) {
+                Text(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = if (isActive) {
+                        displayTime
+                    } else {
+                        displayTime
+                    },
+                    style = MaterialTheme.typography.displayLarge,
+                    textAlign = TextAlign.Center
+                )
+                NumberPad(
+                    onNumberClick = onNumberClick,
+                    onRemoveClick = onRemoveClick,
+                    onStartClick = onStartClick,
+                    onStopClick = onStopClick,
+                    isActive = isKeypadActive
+                )
+            }
         }
     }
 }

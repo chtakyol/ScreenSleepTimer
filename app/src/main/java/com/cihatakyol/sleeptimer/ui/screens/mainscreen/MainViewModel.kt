@@ -123,10 +123,15 @@ class MainViewModel @Inject constructor(
 
     private fun stopCountdown() {
         serviceManager.stopTimer()
-        _state.update { currentState ->
-            currentState.copy(
-                displayTime = timeFormatter.formatTime(currentState.totalSeconds * 1000L)
-            )
+        viewModelScope.launch {
+            val settings = timerSettingsRepository.getTimerSettings()
+            _state.update { currentState ->
+                currentState.copy(
+                    currentInput = settings.lastDuration.toString(),
+                    totalSeconds = settings.lastDuration,
+                    displayTime = timeFormatter.formatTime(settings.lastDuration * 1000L)
+                )
+            }
         }
     }
 

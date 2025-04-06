@@ -36,31 +36,32 @@ fun NumberPad(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            NumberButton(number = 1, onClick = onNumberClick)
-            NumberButton(number = 2, onClick = onNumberClick)
-            NumberButton(number = 3, onClick = onNumberClick)
+            NumberButton(number = 1, onClick = onNumberClick, enabled = !isActive)
+            NumberButton(number = 2, onClick = onNumberClick, enabled = !isActive)
+            NumberButton(number = 3, onClick = onNumberClick, enabled = !isActive)
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            NumberButton(number = 4, onClick = onNumberClick)
-            NumberButton(number = 5, onClick = onNumberClick)
-            NumberButton(number = 6, onClick = onNumberClick)
+            NumberButton(number = 4, onClick = onNumberClick, enabled = !isActive)
+            NumberButton(number = 5, onClick = onNumberClick, enabled = !isActive)
+            NumberButton(number = 6, onClick = onNumberClick, enabled = !isActive)
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            NumberButton(number = 7, onClick = onNumberClick)
-            NumberButton(number = 8, onClick = onNumberClick)
-            NumberButton(number = 9, onClick = onNumberClick)
+            NumberButton(number = 7, onClick = onNumberClick, enabled = !isActive)
+            NumberButton(number = 8, onClick = onNumberClick, enabled = !isActive)
+            NumberButton(number = 9, onClick = onNumberClick, enabled = !isActive)
         }
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            NumberButton(number = 0, onClick = onNumberClick)
+            NumberButton(number = 0, onClick = onNumberClick, enabled = !isActive)
             IconButton(
                 modifier = Modifier.size(64.dp),
-                onClick = onRemoveClick
+                onClick = onRemoveClick,
+                enabled = !isActive
             ) {
                 Icon(
                     Icons.AutoMirrored.Default.KeyboardArrowLeft,
@@ -95,11 +96,13 @@ fun NumberPad(
 @Composable
 private fun NumberButton(
     number: Int,
-    onClick: (Int) -> Unit
+    onClick: (Int) -> Unit,
+    enabled: Boolean
 ) {
     Button(
         onClick = { onClick(number) },
-        modifier = Modifier.size(64.dp)
+        modifier = Modifier.size(64.dp),
+        enabled = enabled
     ) {
         Text(number.toString(), style = MaterialTheme.typography.labelLarge)
     }
@@ -113,6 +116,6 @@ private fun PreviewNumberPad() {
         onRemoveClick = { },
         onStartClick = { },
         onStopClick = { },
-        isActive = true
+        isActive = false
     )
 }

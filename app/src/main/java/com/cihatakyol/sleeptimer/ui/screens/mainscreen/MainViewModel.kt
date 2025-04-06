@@ -1,10 +1,9 @@
 package com.cihatakyol.sleeptimer.ui.screens.mainscreen
 
-import android.app.Application
 import android.content.ComponentName
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cihatakyol.sleeptimer.data.repository.TimerSettingsRepository
 import com.cihatakyol.sleeptimer.receiver.CountdownReceiver
@@ -25,8 +24,7 @@ class MainViewModel @Inject constructor(
     private val serviceManager: ServiceManager,
     private val timeFormatter: TimeFormatter,
     private val timerSettingsRepository: TimerSettingsRepository,
-    application: Application
-) : AndroidViewModel(application) {
+) : ViewModel() {
     private val _state = MutableStateFlow(DurationEntryState())
     val state: StateFlow<DurationEntryState> = _state.asStateFlow()
 

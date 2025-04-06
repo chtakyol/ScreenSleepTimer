@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -100,7 +101,7 @@ private fun NumberButton(
         onClick = { onClick(number) },
         modifier = Modifier.size(64.dp)
     ) {
-        Text(number.toString())
+        Text(number.toString(), style = MaterialTheme.typography.labelLarge)
     }
 }
 

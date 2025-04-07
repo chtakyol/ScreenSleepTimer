@@ -15,15 +15,22 @@ import com.cihatakyol.sleeptimer.receiver.CountdownReceiver
 import com.cihatakyol.sleeptimer.service.SleepTimerForegroundService
 import com.cihatakyol.sleeptimer.ui.screens.mainscreen.MainScreen
 import com.cihatakyol.sleeptimer.ui.theme.SleepTimerTheme
+import com.cihatakyol.sleeptimer.utils.AdManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val countdownReceiver = CountdownReceiver()
 
+    @Inject
+    lateinit var adManager: AdManager
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        adManager.loadInterstitialAd()
 
         // Register the countdown receiver with proper flags
         val filter = IntentFilter(SleepTimerForegroundService.ACTION_COUNTDOWN_UPDATE)
@@ -41,7 +48,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen()
+                    MainScreen(adManager = adManager)
                 }
             }
         }

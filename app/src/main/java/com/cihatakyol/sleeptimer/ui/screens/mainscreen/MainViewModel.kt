@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cihatakyol.sleeptimer.data.repository.TimerSettingsRepository
 import com.cihatakyol.sleeptimer.receiver.CountdownReceiver
+import com.cihatakyol.sleeptimer.utils.AdManager
 import com.cihatakyol.sleeptimer.utils.ScreenManager
 import com.cihatakyol.sleeptimer.utils.ServiceManager
 import com.cihatakyol.sleeptimer.utils.TimeFormatter

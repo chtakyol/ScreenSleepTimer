@@ -1,7 +1,10 @@
 package com.cihatakyol.sleeptimer.ui.screens.mainscreen
 
 import android.Manifest
+import android.app.Activity
 import android.app.admin.DevicePolicyManager
+import android.content.Context
+import android.content.ContextWrapper
 import android.content.Intent
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -30,16 +33,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.cihatakyol.sleeptimer.R
+import com.cihatakyol.sleeptimer.ui.components.AdMobBanner
 import com.cihatakyol.sleeptimer.ui.screens.mainscreen.components.NumberPad
+import com.cihatakyol.sleeptimer.utils.AdManager
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
+
+private fun Context.findActivity(): Activity? = when (this) {
+    is Activity -> this
+    is ContextWrapper -> baseContext.findActivity()
+    else -> null
+}
 
 @RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
+    adManager: AdManager
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -86,12 +98,22 @@ fun MainScreen(
             onStartClick = {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     if (notificationPermissionState.status.isGranted) {
-                        viewModel.onStartClick()
+                        context.findActivity()?.let {
+                            adManager.showInterstitialAd(
+                                activity = it,
+                                onAdClosed = { viewModel.onStartClick() }
+                            )
+                        }
                     } else {
                         notificationPermissionState.launchPermissionRequest()
                     }
                 } else {
-                    viewModel.onStartClick()
+                    context.findActivity()?.let {
+                        adManager.showInterstitialAd(
+                            activity = it,
+                            onAdClosed = { viewModel.onStartClick() }
+                        )
+                    }
                 }
             },
             onStopClick = viewModel::onStopClick,
@@ -125,6 +147,7 @@ fun MainContent(
             style = MaterialTheme.typography.displayLarge,
             textAlign = TextAlign.Center
         )
+        AdMobBanner(modifier = Modifier.fillMaxWidth())
         Spacer(modifier = Modifier.size(128.dp))
         if (!isDeviceAdminActive) {
             DeviceAdminButton(

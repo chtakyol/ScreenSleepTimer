@@ -66,10 +66,12 @@ class MainViewModel @Inject constructor(
 
     private fun setupCountdownReceiver() {
         CountdownReceiver.onCountdownUpdate = { remainingTime, isActive ->
-            _state.update { currentState ->
-                currentState.copy(
-                    displayTime = timeFormatter.formatTime(remainingTime),
-                )
+            if (isActive) {
+                _state.update { currentState ->
+                    currentState.copy(
+                        displayTime = timeFormatter.formatTime(remainingTime),
+                    )
+                }
             }
         }
     }
@@ -128,8 +130,8 @@ class MainViewModel @Inject constructor(
             val settings = timerSettingsRepository.getTimerSettings()
             _state.update { currentState ->
                 currentState.copy(
-                    currentInput = settings.lastDuration.toString(),
-                    totalSeconds = settings.lastDuration,
+//                    currentInput = settings.lastDuration.toString(),
+//                    totalSeconds = settings.lastDuration,
                     displayTime = timeFormatter.formatTime(settings.lastDuration * 1000L)
                 )
             }

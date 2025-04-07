@@ -47,19 +47,23 @@ class AdManager @Inject constructor(
     }
 
     fun showInterstitialAd(activity: Activity, onAdClosed: () -> Unit) {
-        interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
-            override fun onAdDismissedFullScreenContent() {
-                interstitialAd = null
-                Log.d("AdMobEvent", "Ad dismissed fullscreen content.")
-                onAdClosed()
-            }
+        if (interstitialAd != null) {
+            interstitialAd?.fullScreenContentCallback = object : FullScreenContentCallback() {
+                override fun onAdDismissedFullScreenContent() {
+                    interstitialAd = null
+                    Log.d("AdMobEvent", "Ad dismissed fullscreen content.")
+                    onAdClosed()
+                }
 
-            override fun onAdFailedToShowFullScreenContent(error: AdError) {
-                interstitialAd = null
-                loadInterstitialAd()
+                override fun onAdFailedToShowFullScreenContent(error: AdError) {
+                    interstitialAd = null
+                    loadInterstitialAd()
+                }
             }
+            interstitialAd?.show(activity)
+        }  else {
+            onAdClosed()
         }
-        interstitialAd?.show(activity)
     }
 
     fun loadRewardedAd() {

@@ -94,4 +94,7 @@ dependencies {
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.9.0")
     implementation(libs.hilt.navigation.compose)
+
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.0.0")
 }

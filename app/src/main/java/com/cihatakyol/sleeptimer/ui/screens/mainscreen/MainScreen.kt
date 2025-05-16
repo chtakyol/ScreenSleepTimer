@@ -37,10 +37,11 @@ private fun Context.findActivity(): Activity? = when (this) {
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
-    adManager: AdManager
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+
+    val adManager = AdManager(context)
 
     Column(
         modifier = Modifier

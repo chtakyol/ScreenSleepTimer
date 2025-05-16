@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun OnboardingScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
-    onOnboardingComplete: () -> Unit
+    navigateToMainScreen: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -82,7 +82,7 @@ fun OnboardingScreen(
         if (isDeviceAdminActive &&
             (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || notificationPermissionState.status.isGranted)
         ) {
-            onOnboardingComplete()
+            viewModel.completeOnboarding()
         }
     }
 
@@ -107,8 +107,12 @@ fun OnboardingScreen(
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 notificationPermissionState.launchPermissionRequest()
             } else {
-                onOnboardingComplete()
+                viewModel.completeOnboarding()
             }
+        },
+        onOnboardingDone = {
+            viewModel.completeOnboarding()
+            navigateToMainScreen()
         }
     )
 }
@@ -121,6 +125,7 @@ fun OnboardingScreenContent(
     isNotificationPermissionGiven: Boolean = false,
     onRequestDeviceAdminButtonClick: () -> Unit,
     onNotificationPermissionRequestButtonClick: () -> Unit,
+    onOnboardingDone: () -> Unit
 ) {
     val pagerState = rememberPagerState(pageCount = { 3 })
     val coroutineScope = rememberCoroutineScope()
@@ -155,9 +160,7 @@ fun OnboardingScreenContent(
                 2 -> OnboardingPage3(
                     isNotificationPermissionGiven = isNotificationPermissionGiven,
                     onRequestNotificationPermission = onNotificationPermissionRequestButtonClick,
-                    onContinueButtonClick = {
-                        // todo navigate to main screen
-                    }
+                    onContinueButtonClick =onOnboardingDone
                 )
             }
         }
@@ -207,6 +210,9 @@ private fun PreviewOnboardingScreen() {
     OnboardingScreenContent(
         modifier = Modifier,
         onRequestDeviceAdminButtonClick = { },
-        onNotificationPermissionRequestButtonClick = { }
+        onNotificationPermissionRequestButtonClick = { },
+        isDeviceAdminEnabled = TODO(),
+        isNotificationPermissionGiven = TODO(),
+        onOnboardingDone = TODO()
     )
 }

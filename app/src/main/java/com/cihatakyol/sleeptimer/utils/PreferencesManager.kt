@@ -21,10 +21,19 @@ class PreferencesManager @Inject constructor(
     fun getLastDuration(): Int {
         return sharedPreferences.getInt(KEY_LAST_DURATION, DEFAULT_DURATION)
     }
+    
+    fun hasCompletedOnboarding(): Boolean {
+        return sharedPreferences.getBoolean(KEY_COMPLETED_ONBOARDING, false)
+    }
+    
+    fun setCompletedOnboarding(completed: Boolean) {
+        sharedPreferences.edit().putBoolean(KEY_COMPLETED_ONBOARDING, completed).apply()
+    }
 
     companion object {
         private const val PREFS_NAME = "SleepTimerPrefs"
         private const val KEY_LAST_DURATION = "last_duration"
+        private const val KEY_COMPLETED_ONBOARDING = "completed_onboarding"
         private const val DEFAULT_DURATION = 0
     }
 } 

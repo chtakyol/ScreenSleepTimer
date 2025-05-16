@@ -5,4 +5,7 @@
     <string name="device_admin_enabled">Device admin enabled</string>
     <string name="device_admin_disabled">Device admin disabled</string>
     <string name="extend_time">Extend</string>
+    <string name="onboarding_screen_1_title">Welcome to Sleep Timer</string>
+    <string name="onboarding_screen_1_message">Sleep Timer helps you fall asleep by automatically turning off your screen after a set time. Perfect for bedtime reading or listening to music.</string>
+    <string name="onboarding_screen_1_button">Continue</string>
 </resources>

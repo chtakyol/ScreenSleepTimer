@@ -1,0 +1,43 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="512dp"
+    android:height="512dp"
+    android:viewportWidth="512"
+    android:viewportHeight="512">
+  <path
+      android:pathData="M45,0L467,0A45,45 0,0 1,512 45L512,467A45,45 0,0 1,467 512L45,512A45,45 0,0 1,0 467L0,45A45,45 0,0 1,45 0z"
+      android:fillColor="#BB86FC"/>
+  <path
+      android:pathData="M256,256m-198,0a198,198 0,1 1,396 0a198,198 0,1 1,-396 0"
+      android:fillColor="#383838"/>
+  <path
+      android:pathData="M169.5,101.44m-8.66,5a10,10 79.27,1 1,17.32 -10a10,10 79.27,1 1,-17.32 10"
+      android:fillColor="#BB86FC"/>
+  <path
+      android:pathData="M105.45,165.5m-5,8.66a10,10 101.22,1 1,10 -17.32a10,10 101.22,1 1,-10 17.32"
+      android:fillColor="#BB86FC"/>
+  <path
+      android:pathData="M82,253m0,10a10,10 0,1 1,0 -20a10,10 0,1 1,0 20"
+      android:fillColor="#BB86FC"/>
+  <path
+      android:pathData="M105.45,340.5m5,8.66a10,10 107.48,1 1,-10 -17.32a10,10 107.48,1 1,10 17.32"
+      android:fillColor="#BB86FC"/>
+  <path
+      android:pathData="M257,78m-10,0a10,10 0,1 1,20 0a10,10 0,1 1,-20 0"
+      android:fillColor="#BB86FC"/>
+  <path
+      android:pathData="M186.63,395.88C286.04,395.88 366.63,315.29 366.63,215.88C366.63,167.89 347.85,124.29 317.24,92.02C315.79,90.49 317.32,88 319.3,88.72C388.34,113.89 437.63,180.13 437.63,257.88C437.63,357.29 357.04,437.88 257.63,437.88C212.31,437.88 170.9,421.13 139.26,393.48C137.67,392.1 139.12,389.55 141.16,390.08C155.68,393.86 170.92,395.88 186.63,395.88Z"
+      android:fillColor="#BB86FC"
+      android:fillType="evenOdd"/>
+  <path
+      android:pathData="M252.5,249L252.5,134"
+      android:strokeWidth="14"
+      android:fillColor="#00000000"
+      android:strokeColor="#BB86FC"
+      android:strokeLineCap="round"/>
+  <path
+      android:pathData="M251.88,249.67L199.67,283.12"
+      android:strokeWidth="14"
+      android:fillColor="#00000000"
+      android:strokeColor="#BB86FC"
+      android:strokeLineCap="round"/>
+</vector>

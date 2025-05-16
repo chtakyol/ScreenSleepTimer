@@ -7,11 +7,11 @@ plugins {
 
 android {
     namespace = "com.cihatakyol.sleeptimer"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.cihatakyol.sleeptimer"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -90,4 +90,8 @@ dependencies {
 
     // AdMob
     implementation("com.google.android.gms:play-services-ads:22.6.0")
+
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.9.0")
+    implementation(libs.hilt.navigation.compose)
 }

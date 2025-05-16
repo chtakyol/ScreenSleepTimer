@@ -30,7 +30,6 @@ class MainViewModel @Inject constructor(
     val state: StateFlow<DurationEntryState> = _state.asStateFlow()
 
     init {
-        updateDeviceAdminState()
         setupCountdownReceiver()
         observeServiceState()
         loadLastDuration()
@@ -74,14 +73,6 @@ class MainViewModel @Inject constructor(
                 }
             }
         }
-    }
-
-    fun updateDeviceAdminState() {
-        _state.update { it.copy(isDeviceAdminActive = screenManager.isDeviceAdminActive()) }
-    }
-
-    fun getComponentName(): ComponentName {
-        return screenManager.getComponentName()
     }
 
     fun onNumberClick(number: Int) {
@@ -138,7 +129,6 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     private fun startCountdown() {
         val duration = _state.value.totalSeconds * 1000L
         serviceManager.startTimer(duration)
@@ -163,6 +153,5 @@ data class DurationEntryState(
     val totalSeconds: Int = 0,
     val displayTime: String = "00:00:00",
     val isCountdownActive: Boolean = false,
-    val isDeviceAdminActive: Boolean = false,
     val isActive: Boolean = false
 ) 

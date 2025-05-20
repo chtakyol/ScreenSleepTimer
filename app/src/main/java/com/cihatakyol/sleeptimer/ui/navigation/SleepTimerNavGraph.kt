@@ -12,20 +12,21 @@ import androidx.navigation.compose.rememberNavController
 import com.cihatakyol.sleeptimer.ui.screens.mainscreen.MainScreen
 import com.cihatakyol.sleeptimer.ui.screens.onboarding.OnboardingScreen
 import com.cihatakyol.sleeptimer.ui.screens.onboarding.OnboardingViewModel
-import com.cihatakyol.sleeptimer.ui.screens.splash.SplashScreen
-
 
 @Composable
-fun SleepTimerNavGraph() {
+fun SleepTimerNavGraph(
+    onSplashScreenFinished: () -> Unit = {}
+) {
     val navController = rememberNavController()
     val actions = remember(navController) { MainActions(navController) }
     val onboardingViewModel: OnboardingViewModel = hiltViewModel()
     val onboardingState by onboardingViewModel.state.collectAsState()
 
     if (onboardingState.isLoading) {
-        SplashScreen()
         return
     }
+
+    onSplashScreenFinished()
 
     NavHost(
         navController = navController,

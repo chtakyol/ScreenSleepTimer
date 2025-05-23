@@ -47,7 +47,7 @@ private fun OnboardingPage2DeviceAdminAlreadyEnabled(
                 painter = painterResource(id = R.drawable.ic_launcher_foreground),
                 contentDescription = "Device Admin Icon",
                 modifier = Modifier.size(120.dp),
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onBackground
             )
         },
         title = "Device Admin Permission",

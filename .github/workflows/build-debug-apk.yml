@@ -2,9 +2,9 @@ name: Build Debug APK
 
 on:
   push:
-    branches: [ master ]
+    branches: [ develop ]
   pull_request:
-    branches: [ master ]
+    branches: [ develop ]
   workflow_dispatch:
 
 jobs:
@@ -35,4 +35,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: sleeptimer-debug-v${{ needs.get-version.outputs.version_name }}
-        path: app/build/outputs/apk/debug/app-debug.apk
+        path: app/build/outputs/apk/debug/app-release.apk

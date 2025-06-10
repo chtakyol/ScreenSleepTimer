@@ -1,11 +1,6 @@
 name: Build Debug APK
 
 on:
-  push:
-    branches: [ develop ]
-  pull_request:
-    branches: [ develop ]
-  workflow_dispatch:
 
 jobs:
   get-version:

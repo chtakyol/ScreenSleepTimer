@@ -34,31 +34,52 @@ class NotificationManager @Inject constructor(
     }
 
     private fun createNotificationChannel() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
-                CHANNEL_ID,
-                CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_HIGH
-            ).apply {
-                description = CHANNEL_DESCRIPTION
-                enableLights(true)
-                enableVibration(false)
-                setShowBadge(true)
-                setSound(null, null)
-            }
-            notificationManager.createNotificationChannel(channel)
+        val channel = NotificationChannel(
+            CHANNEL_ID,
+            CHANNEL_NAME,
+            NotificationManager.IMPORTANCE_HIGH
+        ).apply {
+            description = CHANNEL_DESCRIPTION
+            enableLights(true)
+            enableVibration(false)
+            setShowBadge(true)
+            setSound(null, null)
         }
+        notificationManager.createNotificationChannel(channel)
     }
 
     fun createCountdownNotification(remainingTime: Long): Notification {
-        val contentIntent = Intent(context, SleepTimerForegroundService::class.java).apply {
+        // PendingIntent to open MainActivity when the notification is clicked
+        val openAppIntent = Intent(context, MainActivity::class.java).apply {
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+        }
+        val openAppPendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            openAppIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // PendingIntent for "Extend Time" action (still points to service)
+        val extendTimeIntent = Intent(context, SleepTimerForegroundService::class.java).apply {
             action = SleepTimerForegroundService.ACTION_EXTEND_TIME
             putExtra(SleepTimerForegroundService.EXTRA_EXTEND_TIME, 5000L) // 5 seconds
         }
-        val contentPendingIntent = PendingIntent.getService(
+        val extendTimePendingIntent = PendingIntent.getService(
             context,
-            0,
-            contentIntent,
+            1,
+            extendTimeIntent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // PendingIntent for "Stop" action (still points to service)
+        val stopIntent = Intent(context, SleepTimerForegroundService::class.java).apply {
+            action = SleepTimerForegroundService.ACTION_STOP
+        }
+        val stopPendingIntent = PendingIntent.getService(
+            context,
+            2,
+            stopIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
@@ -73,11 +94,16 @@ class NotificationManager @Inject constructor(
             .setOnlyAlertOnce(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
             .setColor(context.getColor(R.color.purple_500))
-            .setContentIntent(contentPendingIntent)
+            .setContentIntent(openAppPendingIntent)
             .addAction(
                 R.drawable.ic_launcher_foreground,
                 context.getString(R.string.extend_time),
-                contentPendingIntent
+                extendTimePendingIntent
+            )
+            .addAction(
+                R.drawable.ic_launcher_foreground,
+                "Stop",
+                stopPendingIntent
             )
             .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .build()

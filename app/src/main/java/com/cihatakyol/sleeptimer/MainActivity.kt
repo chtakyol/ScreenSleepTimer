@@ -23,16 +23,11 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             SleepTimerTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    SleepTimerNavGraph(
-                        onSplashScreenFinished = {
-                            keepSplashScreen = false
-                        }
-                    )
-                }
+                SleepTimerNavGraph(
+                    onSplashScreenFinished = {
+                        keepSplashScreen = false
+                    }
+                )
             }
         }
     }

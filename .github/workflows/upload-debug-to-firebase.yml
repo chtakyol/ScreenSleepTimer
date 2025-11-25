@@ -1,0 +1,37 @@
+name: Upload to Debug APK Firebase App Distribution
+
+on:
+  workflow_run:
+    workflows: ["build-unsigned-apk.yml"]
+    types:
+      - completed
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          path: ./apk
+
+      - name: List downloaded files (for debug)
+        run: ls -R ./apk
+
+      - name: Find APK file path
+        id: find_apk
+        run: |
+          APK_PATH=$(find ./apk -name "*.apk" | head -n 1)
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
+
+      - name: Setup Fastlane
+        uses: ./.github/actions/setup-fastlane
+
+      - name: Upload to Firebase via Fastlane
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_TESTERS: ${{ secrets.FIREBASE_TESTERS }}
+          FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}
+          APK_PATH: ${{ steps.find_apk.outputs.apk_path }}
+        run: bundle exec fastlane upload_debug_apk_to_firebase

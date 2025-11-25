@@ -36,6 +36,13 @@ platform :android do
     upload_to_play_store
   end
 
+  desc "Build debug APK"
+  lane :build_debug do
+    gradle(
+      task: "assembleDebug"
+    )
+  end
+
   desc "Build and sign APK with the provided keystore"
   lane :build_signed_apk do
     UI.message("Fastlane working directory: #{Dir.pwd}")
@@ -62,10 +69,10 @@ platform :android do
 
   desc "Deploy test version to Firebase"
   lane :upload_debug_apk_to_firebase do
-#     firebase_app_distribution(
-#       app: ENV["FIREBASE_APP_ID"],
-#       apk_path: "./app-debug.apk",
-#       firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"]
-#     )
+    firebase_app_distribution(
+      app: ENV["FIREBASE_APP_ID"],
+      apk_path: "./app-debug.apk",
+      firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"]
+    )
   end
 end

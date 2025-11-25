@@ -5,6 +5,7 @@ on:
     workflows: ["Build Unsigned APK"]
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   upload:

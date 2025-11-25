@@ -5,6 +5,7 @@ on:
     workflows: ["build-unsigned-apk.yml"]
     types:
       - completed
+  workflow_dispatch:
 
 jobs:
   upload:

@@ -39,4 +39,15 @@ class TimeFormatter @Inject constructor() {
             0L
         }
     }
-} 
+
+    fun formatToMillis(time: Pair<Int, Int>): Long {
+        val (hours, minutes) = time
+        return (hours * 60L * 60L * 1000L) + (minutes * 60L * 1000L)
+    }
+
+    fun parseFromMillis(millis: Long): Pair<Int, Int> {
+        val hours = (millis / (1000 * 60 * 60)).toInt()
+        val minutes = ((millis % (1000 * 60 * 60)) / (1000 * 60)).toInt()
+        return Pair(hours, minutes)
+    }
+}

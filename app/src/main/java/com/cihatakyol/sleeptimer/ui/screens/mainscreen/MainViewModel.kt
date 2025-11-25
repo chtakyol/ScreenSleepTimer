@@ -1,17 +1,14 @@
 package com.cihatakyol.sleeptimer.ui.screens.mainscreen
 
-import android.content.ComponentName
-import android.os.Build
-import androidx.annotation.RequiresApi
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.cihatakyol.sleeptimer.data.repository.TimerSettingsRepository
 import com.cihatakyol.sleeptimer.receiver.CountdownReceiver
-import com.cihatakyol.sleeptimer.utils.AdManager
-import com.cihatakyol.sleeptimer.utils.ScreenManager
 import com.cihatakyol.sleeptimer.utils.ServiceManager
 import com.cihatakyol.sleeptimer.utils.TimeFormatter
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -21,13 +18,12 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val screenManager: ScreenManager,
     private val serviceManager: ServiceManager,
     private val timeFormatter: TimeFormatter,
     private val timerSettingsRepository: TimerSettingsRepository,
 ) : ViewModel() {
-    private val _state = MutableStateFlow(DurationEntryState())
-    val state: StateFlow<DurationEntryState> = _state.asStateFlow()
+    private val _state = MutableStateFlow(MainScreenUIState())
+    val state: StateFlow<MainScreenUIState> = _state.asStateFlow()
 
     init {
         setupCountdownReceiver()
@@ -38,12 +34,13 @@ class MainViewModel @Inject constructor(
     private fun loadLastDuration() {
         viewModelScope.launch {
             val settings = timerSettingsRepository.getTimerSettings()
-            if (settings.lastDuration > 0) {
+            if (settings.lastSetDurationByUser > 0) {
                 _state.update { currentState ->
                     currentState.copy(
-                        currentInput = settings.lastDuration.toString(),
-                        totalSeconds = settings.lastDuration,
-                        displayTime = timeFormatter.formatTime(settings.lastDuration * 1000L)
+                        displayTime = DisplayTime(
+                            hour = timeFormatter.parseFromMillis(settings.lastSetDurationByUser).first,
+                            minute = timeFormatter.parseFromMillis(settings.lastSetDurationByUser).second
+                        )
                     )
                 }
             }
@@ -56,8 +53,10 @@ class MainViewModel @Inject constructor(
                 _state.update { currentState ->
                     currentState.copy(
                         isCountdownActive = isRunning,
-                        isActive = isRunning
                     )
+                }
+                if (!isRunning) {
+                    stopCountdown()
                 }
             }
         }
@@ -68,46 +67,39 @@ class MainViewModel @Inject constructor(
             if (isActive) {
                 _state.update { currentState ->
                     currentState.copy(
-                        displayTime = timeFormatter.formatTime(remainingTime),
+                        displayTime = DisplayTime(
+                            hour = timeFormatter.parseFromMillis(remainingTime).first,
+                            minute = timeFormatter.parseFromMillis(remainingTime).second
+                        )
                     )
                 }
             }
         }
     }
 
-    fun onNumberClick(number: Int) {
-        if (_state.value.currentInput.length < 4) {
-            _state.update { currentState ->
-                currentState.copy(
-                    currentInput = currentState.currentInput + number,
-                    totalSeconds = (currentState.currentInput + number).toIntOrNull() ?: 0
-                )
-            }
-            updateDisplayTime()
+    fun onTimeSelected(hour: Int, minute: Int) {
+        _state.update { currentState ->
+            currentState.copy(
+                displayTime = DisplayTime(hour = hour, minute = minute),
+                selectedDurationInMillis = timeFormatter.formatToMillis(Pair(hour, minute))
+            )
         }
     }
 
-    fun onRemoveClick() {
-        val currentInput = _state.value.currentInput
-        if (currentInput.isNotEmpty()) {
-            val newInput = currentInput.substring(0, currentInput.length - 1)
-            _state.update { currentState ->
-                currentState.copy(
-                    currentInput = newInput,
-                    totalSeconds = newInput.toIntOrNull() ?: 0
-                )
-            }
-            updateDisplayTime()
-        }
-    }
-
-    @RequiresApi(Build.VERSION_CODES.O)
     fun onStartClick() {
-        if (_state.value.totalSeconds > 0) {
+        if (_state.value.selectedDurationInMillis > 0) {
             viewModelScope.launch {
-                timerSettingsRepository.saveLastDuration(_state.value.totalSeconds)
+                timerSettingsRepository.saveLastDuration(_state.value.selectedDurationInMillis)
                 startCountdown()
             }
+        }
+    }
+
+    fun onToggleClick() {
+        if (state.value.isCountdownActive) {
+            onStopClick()
+        } else {
+            onStartClick()
         }
     }
 
@@ -121,26 +113,19 @@ class MainViewModel @Inject constructor(
             val settings = timerSettingsRepository.getTimerSettings()
             _state.update { currentState ->
                 currentState.copy(
-//                    currentInput = settings.lastDuration.toString(),
-//                    totalSeconds = settings.lastDuration,
-                    displayTime = timeFormatter.formatTime(settings.lastDuration * 1000L)
+                    displayTime = DisplayTime(
+                        hour = timeFormatter.parseFromMillis(settings.lastSetDurationByUser).first,
+                        minute = timeFormatter.parseFromMillis(settings.lastSetDurationByUser).second
+                    )
                 )
             }
         }
     }
 
     private fun startCountdown() {
-        val duration = _state.value.totalSeconds * 1000L
-        serviceManager.startTimer(duration)
+        serviceManager.startTimer(state.value.selectedDurationInMillis)
     }
 
-    private fun updateDisplayTime(seconds: Int = _state.value.totalSeconds) {
-        _state.update { currentState ->
-            currentState.copy(
-                displayTime = timeFormatter.formatTime(seconds * 1000L)
-            )
-        }
-    }
 
     override fun onCleared() {
         super.onCleared()
@@ -148,10 +133,13 @@ class MainViewModel @Inject constructor(
     }
 }
 
-data class DurationEntryState(
-    val currentInput: String = "",
-    val totalSeconds: Int = 0,
-    val displayTime: String = "00:00:00",
+data class MainScreenUIState(
+    val selectedDurationInMillis: Long = 0,
+    val displayTime: DisplayTime = DisplayTime(hour = 0, minute = 0),
     val isCountdownActive: Boolean = false,
-    val isActive: Boolean = false
-) 
+)
+
+data class DisplayTime(
+    val hour: Int,
+    val minute: Int
+)

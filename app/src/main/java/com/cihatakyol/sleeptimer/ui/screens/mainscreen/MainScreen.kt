@@ -3,13 +3,24 @@ package com.cihatakyol.sleeptimer.ui.screens.mainscreen
 import android.app.Activity
 import android.content.Context
 import android.content.ContextWrapper
-import androidx.compose.foundation.layout.Arrangement
+import android.util.Log
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.with
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayCircle
+import androidx.compose.material.icons.filled.StopCircle
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,13 +28,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.cihatakyol.sleeptimer.ui.components.AdMobBanner
-import com.cihatakyol.sleeptimer.ui.screens.mainscreen.components.NumberPad
+import com.cihatakyol.sleeptimer.ui.screens.mainscreen.components.TimePicker
 import com.cihatakyol.sleeptimer.utils.AdManager
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
@@ -43,92 +53,85 @@ fun MainScreen(
 
     val adManager = AdManager(context)
 
-    Column(
+//    context.findActivity()?.let {
+//        adManager.showInterstitialAd(
+//            activity = it,
+//            onAdClosed = { viewModel.onStartClick() }
+//        )
+//    }
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+            .background(MaterialTheme.colorScheme.background),
+        contentAlignment = Alignment.Center,
     ) {
-        MainContent(
-            onNumberClick = viewModel::onNumberClick,
-            onRemoveClick = viewModel::onRemoveClick,
-            onStartClick = {
-                context.findActivity()?.let {
-                    adManager.showInterstitialAd(
-                        activity = it,
-                        onAdClosed = { viewModel.onStartClick() }
-                    )
-                }
-
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//                    if (notificationPermissionState.status.isGranted) {
-//                        context.findActivity()?.let {
-//                            adManager.showInterstitialAd(
-//                                activity = it,
-//                                onAdClosed = { viewModel.onStartClick() }
-//                            )
-//                        }
-//                    } else {
-//                        notificationPermissionState.launchPermissionRequest()
-//                    }
-//                } else {
-//
-//                }
-            },
-            onStopClick = viewModel::onStopClick,
-            isKeypadActive = state.isCountdownActive,
-            isActive = state.isActive,
-            displayTime = state.displayTime
-        )
+        state.apply {
+            MainContent(
+                currentHour = displayTime.hour,
+                currentMinute = displayTime.minute,
+                isActive = isCountdownActive,
+                onTimeSelected = viewModel::onTimeSelected,
+                onStartToggle = viewModel::onToggleClick
+            )
+        }
     }
 }
 
 @Composable
 fun MainContent(
-    onNumberClick: (Int) -> Unit,
-    onRemoveClick: () -> Unit,
-    onStartClick: () -> Unit,
-    onStopClick: () -> Unit,
-    isKeypadActive: Boolean = true,
-    isActive: Boolean = true,
-    displayTime: String
+    currentHour: Int = 12,
+    currentMinute: Int = 0,
+    isActive: Boolean = false,
+    onTimeSelected: (hour: Int, minute: Int) -> Unit,
+    onStartToggle: () -> Unit
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = "Screen Timer",
-            style = MaterialTheme.typography.displayLarge,
-            textAlign = TextAlign.Center
+        TimePicker(
+            isTimerActive = isActive,
+            currentHour = currentHour,
+            currentMinute = currentMinute,
+            onTimeSelected = { hour, minute ->
+                onTimeSelected(hour, minute)
+                Log.d("TimePicker", "Selected Time: ${hour ?: "--"}:${minute ?: "--"}")
+            }
         )
-        AdMobBanner(modifier = Modifier.fillMaxWidth())
-        Spacer(modifier = Modifier.size(128.dp))
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(32.dp)
-        ) {
-            Text(
-                modifier = Modifier.fillMaxWidth(),
-                text = if (isActive) {
-                    displayTime
-                } else {
-                    displayTime
-                },
-                style = MaterialTheme.typography.displayLarge,
-                textAlign = TextAlign.Center
-            )
-            NumberPad(
-                onNumberClick = onNumberClick,
-                onRemoveClick = onRemoveClick,
-                onStartClick = onStartClick,
-                onStopClick = onStopClick,
-                isActive = isKeypadActive
-            )
+
+        AnimatedIconButton(isActive = isActive, onClick = onStartToggle)
+    }
+}
+
+@OptIn(ExperimentalAnimationApi::class)
+@Composable
+fun AnimatedIconButton(
+    isActive: Boolean,
+    onClick: () -> Unit
+) {
+    IconButton(onClick = onClick) {
+        AnimatedContent(
+            targetState = !isActive,
+            transitionSpec = {
+                fadeIn(tween(300)) with fadeOut(tween(300))
+            },
+            label = "IconToggle"
+        ) { targetState ->
+            if (targetState) {
+                Icon(
+                    modifier = Modifier.size(48.dp),
+                    imageVector = Icons.Default.PlayCircle,
+                    contentDescription = "Start timer",
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            } else {
+                Icon(
+                    modifier = Modifier.size(48.dp),
+                    imageVector = Icons.Default.StopCircle,
+                    contentDescription = "Stop timer",
+                    tint = MaterialTheme.colorScheme.error
+                )
+            }
         }
     }
 }
@@ -138,13 +141,11 @@ fun MainContent(
 fun MainScreenPreview() {
     MaterialTheme {
         MainContent(
-            onNumberClick = { },
-            onRemoveClick = { },
-            onStartClick = { },
-            onStopClick = { },
-            isKeypadActive = false,
-            isActive = true,
-            displayTime = "12:00"
+            currentHour = 21,
+            currentMinute = 2,
+            isActive = false,
+            onTimeSelected = { hour, minute -> },
+            onStartToggle = { }
         )
     }
 }

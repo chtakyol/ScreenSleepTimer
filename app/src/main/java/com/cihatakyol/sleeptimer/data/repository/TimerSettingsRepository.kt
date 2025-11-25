@@ -17,8 +17,8 @@ class TimerSettingsRepository @Inject constructor(
         dataSource.saveTimerSettings(settings)
     }
 
-    suspend fun saveLastDuration(duration: Int) {
+    suspend fun saveLastDuration(duration: Long) {
         val currentSettings = getTimerSettings()
-        saveTimerSettings(currentSettings.copy(lastDuration = duration))
+        saveTimerSettings(currentSettings.copy(lastSetDurationByUser = duration))
     }
 } 

@@ -24,6 +24,7 @@ class SleepTimerForegroundService : Service() {
         const val ACTION_EXTEND_TIME = "com.cihatakyol.sleeptimer.EXTEND_TIME"
         const val EXTRA_EXTEND_TIME = "extend_time"
         const val PERMISSION_RECEIVE_COUNTDOWN = "com.cihatakyol.sleeptimer.permission.RECEIVE_COUNTDOWN"
+        const val ACTION_STOP = "com.cihatakyol.sleeptimer.permission.STOP"
     }
 
     @Inject
@@ -66,6 +67,9 @@ class SleepTimerForegroundService : Service() {
                     extendCountdown(extendTime)
                 }
             }
+            ACTION_STOP -> {
+                stopCountdown()
+            }
             else -> {
                 intent?.getLongExtra(EXTRA_DURATION, 0)?.let { duration ->
                     startCountdown(duration)
@@ -85,7 +89,7 @@ class SleepTimerForegroundService : Service() {
         countDownTimer?.cancel()
         remainingTime = duration
 
-        countDownTimer = object : CountDownTimer(duration, 1000) {
+        countDownTimer = object : CountDownTimer(duration, 10) {
             override fun onTick(millisUntilFinished: Long) {
                 remainingTime = millisUntilFinished
                 notificationManager.updateNotification(millisUntilFinished)
@@ -107,6 +111,11 @@ class SleepTimerForegroundService : Service() {
             setPackage(packageName)
         }
         sendBroadcast(intent, PERMISSION_RECEIVE_COUNTDOWN)
+    }
+
+    fun stopCountdown() {
+        countDownTimer?.cancel()
+        stopSelf()
     }
 
     override fun onDestroy() {

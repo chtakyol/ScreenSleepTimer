@@ -1,10 +1,14 @@
 name: Build Debug APK
 
 on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch:
 
 jobs:
   get-version:
-    uses: ./.github/workflows/reusable/get-version-name.yml
+    uses: ./.github/workflows/get-version-name.yml
 
   build:
     needs: get-version

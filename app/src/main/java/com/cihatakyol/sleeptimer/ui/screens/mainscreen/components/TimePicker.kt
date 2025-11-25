@@ -77,7 +77,7 @@ fun SwipeSelector(
     val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(selectedIndex) {
-        if (!listState.isScrollInProgress) { // 👈 don't fight the user
+        if (!listState.isScrollInProgress) {
             coroutineScope.launch {
                 listState.animateScrollToItem(selectedIndex)
             }

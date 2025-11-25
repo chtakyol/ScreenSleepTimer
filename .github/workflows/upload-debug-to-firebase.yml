@@ -14,11 +14,16 @@ jobs:
       - name: Download artifact
         uses: actions/download-artifact@v4
         with:
-          name: debug-apk
           path: ./apk
 
       - name: List downloaded files (for debug)
         run: ls -R ./apk
+
+      - name: Find APK file path
+        id: find_apk
+        run: |
+          APK_PATH=$(find ./apk -name "*.apk" | head -n 1)
+          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
 
       - name: Setup Fastlane
         uses: ./.github/actions/setup-fastlane
@@ -28,4 +33,5 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_TESTERS: ${{ secrets.FIREBASE_TESTERS }}
           FIREBASE_CLI_TOKEN: ${{ secrets.FIREBASE_CLI_TOKEN }}
+          APK_PATH: ${{ steps.find_apk.outputs.apk_path }}
         run: bundle exec fastlane upload_debug_apk_to_firebase

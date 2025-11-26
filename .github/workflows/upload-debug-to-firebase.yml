@@ -2,7 +2,7 @@ name: Upload to Debug APK Firebase App Distribution
 
 on:
   workflow_run:
-    workflows: ["Build Unsigned APK"]
+    workflows: ["build-unsigned-apk.yml"]
     types:
       - completed
   workflow_dispatch:

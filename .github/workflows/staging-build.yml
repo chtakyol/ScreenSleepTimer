@@ -1,0 +1,98 @@
+name: Staging Build
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  build-staging:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Decode staging keystore
+        env:
+          STAGING_KEYSTORE_FILE: ${{ secrets.STAGING_KEYSTORE_FILE }}
+        run: |
+          echo "$STAGING_KEYSTORE_FILE" | base64 --decode > keystores/staging.jks
+
+      - name: Decode google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
+
+      - name: Run unit tests
+        run: ./gradlew testReleaseUnitTest --continue
+        continue-on-error: true
+
+      - name: Build Staging Release APK
+        env:
+          STAGING_KEYSTORE_PASSWORD: ${{ secrets.STAGING_KEYSTORE_PASSWORD }}
+          STAGING_KEY_ALIAS: ${{ secrets.STAGING_KEY_ALIAS }}
+          STAGING_KEY_PASSWORD: ${{ secrets.STAGING_KEY_PASSWORD }}
+        run: ./gradlew assembleStagingRelease
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.0'
+          bundler-cache: true
+
+      - name: Install Fastlane dependencies
+        run: bundle install
+
+      - name: Upload to Firebase App Distribution
+        env:
+          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
+          RELEASE_NOTES: "Staging build from commit ${{ github.sha }}: ${{ github.event.head_commit.message }}"
+        run: bundle exec fastlane distribute_staging
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-test-results
+          path: app/build/test-results/**/*.xml
+          retention-days: 30
+
+      - name: Upload APK as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-staging-release
+          path: app/build/outputs/apk/staging/release/app-staging-release.apk
+          retention-days: 90
+
+      - name: Upload mapping files as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: staging-mapping-files
+          path: app/build/outputs/mapping/stagingRelease/
+          retention-days: 90
+
+      - name: Cleanup keystore
+        if: always()
+        run: rm -f keystores/staging.jks

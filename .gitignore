@@ -13,3 +13,12 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Keystores - Never commit signing keys
+/keystores/
+*.jks
+*.keystore
+
+# Firebase configuration - Contains sensitive IDs
+google-services.json
+app/google-services.json

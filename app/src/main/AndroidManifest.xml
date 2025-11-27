@@ -25,6 +25,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.SleepTimer"
         tools:targetApi="31">
+
+        <!-- Fix for AdMob and Firebase Analytics manifest conflict -->
+        <property
+            android:name="android.adservices.AD_SERVICES_CONFIG"
+            android:resource="@xml/gma_ad_services_config"
+            tools:replace="android:resource" />
         
         <receiver
             android:name=".receiver.SleepTimerDeviceAdmin"
@@ -64,10 +70,10 @@
             </intent-filter>
         </activity>
 
-        <!-- AdMob app ID -->
+        <!-- AdMob app ID - using manifest placeholder from build.gradle -->
         <meta-data
             android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="ca-app-pub-3940256099942544~3347511713" />
+            android:value="${admobAppId}" />
     </application>
 
 </manifest>

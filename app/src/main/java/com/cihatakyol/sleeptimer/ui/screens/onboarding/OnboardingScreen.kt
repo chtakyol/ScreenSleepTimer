@@ -211,8 +211,8 @@ private fun PreviewOnboardingScreen() {
         modifier = Modifier,
         onRequestDeviceAdminButtonClick = { },
         onNotificationPermissionRequestButtonClick = { },
-        isDeviceAdminEnabled = TODO(),
-        isNotificationPermissionGiven = TODO(),
-        onOnboardingDone = TODO()
+        isDeviceAdminEnabled = false,
+        isNotificationPermissionGiven = false,
+        onOnboardingDone = {  }
     )
 }

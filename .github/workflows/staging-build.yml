@@ -55,21 +55,20 @@ jobs:
           STAGING_KEY_PASSWORD: ${{ secrets.STAGING_KEY_PASSWORD }}
         run: ./gradlew assembleStagingRelease
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.0'
-          bundler-cache: true
-
-      - name: Install Fastlane dependencies
-        run: bundle install
+      - name: Install Firebase CLI
+        run: |
+          curl -sL https://firebase.tools | bash
 
       - name: Upload to Firebase App Distribution
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          RELEASE_NOTES: "Staging build from commit ${{ github.sha }}: ${{ github.event.head_commit.message }}"
-        run: bundle exec fastlane distribute_staging
+        run: |
+          firebase appdistribution:distribute app/build/outputs/apk/staging/release/app-staging-release.apk \
+            --app "$FIREBASE_APP_ID" \
+            --groups "internal-developers,beta-testers" \
+            --release-notes "Staging build from commit ${{ github.sha }}: ${{ github.event.head_commit.message }}" \
+            --token "$FIREBASE_TOKEN"
 
       - name: Upload test results
         if: always()

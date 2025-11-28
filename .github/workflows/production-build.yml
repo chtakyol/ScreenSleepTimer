@@ -71,11 +71,8 @@ jobs:
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '3.0'
+          ruby-version: '3.2'
           bundler-cache: true
-
-      - name: Install Fastlane dependencies
-        run: bundle install
 
       - name: Upload to Google Play Console (Internal Testing)
         env:

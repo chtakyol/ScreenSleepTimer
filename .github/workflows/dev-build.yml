@@ -50,11 +50,11 @@ jobs:
 
       - name: Upload to Firebase App Distribution
         env:
-          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_APP_ID_DEV: ${{ secrets.FIREBASE_APP_ID_DEV }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
           firebase appdistribution:distribute app/build/outputs/apk/dev/debug/app-dev-debug.apk \
-            --app "$FIREBASE_APP_ID" \
+            --app "$FIREBASE_APP_ID_DEV" \
             --groups "internal-developers" \
             --release-notes "Dev build from PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}" \
             --token "$FIREBASE_TOKEN"

@@ -47,7 +47,7 @@ This document provides a step-by-step checklist for adding all required secrets 
   - Value: [Your production key password]
   - ⚠️ Use the actual key password for screenTimerKeyStore.jks
 
-### Firebase Secrets (3 secrets)
+### Firebase Secrets (4 secrets)
 
 - [ ] **GOOGLE_SERVICES_JSON**
   - Source: Copy content from `keystores/google-services_base64.txt`
@@ -57,9 +57,17 @@ This document provides a step-by-step checklist for adding all required secrets 
   - Value: [Token from `firebase login:ci` command]
   - Format: `1//0...` (long string)
 
-- [ ] **FIREBASE_APP_ID**
-  - Value: `1:1013770654798:android:6a641fa491f0cba749df1f`
-  - Source: From google-services.json (`mobilesdk_app_id`)
+- [ ] **FIREBASE_APP_ID_DEV**
+  - Value: Firebase App ID for dev variant (package: com.cihatakyol.sleeptimer.dev)
+  - Format: `1:XXXXXXXXXX:android:XXXXXXXXXXXXXXXX`
+  - Source: Firebase Console → Project Settings → SleepTimer Dev app → App ID
+  - See `docs/FIREBASE_APPS_SETUP.md` for setup instructions
+
+- [ ] **FIREBASE_APP_ID_STAGING**
+  - Value: Firebase App ID for staging variant (package: com.cihatakyol.sleeptimer.staging)
+  - Format: `1:XXXXXXXXXX:android:XXXXXXXXXXXXXXXX`
+  - Source: Firebase Console → Project Settings → SleepTimer Staging app → App ID
+  - See `docs/FIREBASE_APPS_SETUP.md` for setup instructions
 
 ### Google Play Secrets (1 secret)
 
@@ -83,11 +91,11 @@ This document provides a step-by-step checklist for adding all required secrets 
   - Value: [Your production interstitial ad unit ID]
   - Format: `ca-app-pub-XXXXXXXXXXXXXXXX/XXXXXXXXXX`
 
-## Total Secrets: 14
+## Total Secrets: 15
 
 ### Summary by Category:
 - **Keystores:** 8 secrets (4 staging + 4 release)
-- **Firebase:** 3 secrets
+- **Firebase:** 4 secrets
 - **Google Play:** 1 secret
 - **AdMob:** 3 secrets
 
@@ -115,9 +123,14 @@ keytool -list -v -keystore keystores/release.jks
 # If you don't have the password, you'll need to use the original screenTimerKeyStore.jks
 ```
 
-### For Firebase App ID:
-Already available from google-services.json:
-- App ID: `1:1013770654798:android:6a641fa491f0cba749df1f`
+### For Firebase App IDs:
+You need to create three Firebase Android apps (one for each variant):
+
+1. **FIREBASE_APP_ID_DEV**: For package `com.cihatakyol.sleeptimer.dev`
+2. **FIREBASE_APP_ID_STAGING**: For package `com.cihatakyol.sleeptimer.staging`
+3. **Production App**: For package `com.cihatakyol.sleeptimer` (already exists)
+
+See detailed setup instructions in `docs/FIREBASE_APPS_SETUP.md`
 
 ### For AdMob IDs:
 Check your AdMob account:
@@ -130,7 +143,7 @@ Check your AdMob account:
 
 After adding all secrets, verify in GitHub:
 1. Go to **Settings** → **Secrets and variables** → **Actions**
-2. You should see **14 repository secrets**
+2. You should see **15 repository secrets**
 3. Names should match exactly (case-sensitive)
 
 ## Security Reminder

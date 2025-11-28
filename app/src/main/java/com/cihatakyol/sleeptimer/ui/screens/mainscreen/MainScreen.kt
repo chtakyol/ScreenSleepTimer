@@ -11,10 +11,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.with
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.StopCircle
@@ -87,7 +89,8 @@ fun MainContent(
     onStartToggle: () -> Unit
 ) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         TimePicker(
             isTimerActive = isActive,
@@ -109,7 +112,9 @@ fun AnimatedIconButton(
     isActive: Boolean,
     onClick: () -> Unit
 ) {
-    IconButton(onClick = onClick) {
+    IconButton(
+        modifier = Modifier.size(120.dp),
+        onClick = onClick) {
         AnimatedContent(
             targetState = !isActive,
             transitionSpec = {
@@ -119,14 +124,14 @@ fun AnimatedIconButton(
         ) { targetState ->
             if (targetState) {
                 Icon(
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(96.dp),
                     imageVector = Icons.Default.PlayCircle,
                     contentDescription = "Start timer",
                     tint = MaterialTheme.colorScheme.primary
                 )
             } else {
                 Icon(
-                    modifier = Modifier.size(48.dp),
+                    modifier = Modifier.size(96.dp),
                     imageVector = Icons.Default.StopCircle,
                     contentDescription = "Stop timer",
                     tint = MaterialTheme.colorScheme.error

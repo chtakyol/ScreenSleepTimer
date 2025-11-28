@@ -96,12 +96,12 @@ class NotificationManager @Inject constructor(
             .setColor(context.getColor(R.color.purple_500))
             .setContentIntent(openAppPendingIntent)
             .addAction(
-                R.drawable.ic_launcher_foreground,
+                R.drawable.ic_notification,
                 context.getString(R.string.extend_time),
                 extendTimePendingIntent
             )
             .addAction(
-                R.drawable.ic_launcher_foreground,
+                R.drawable.ic_notification,
                 "Stop",
                 stopPendingIntent
             )

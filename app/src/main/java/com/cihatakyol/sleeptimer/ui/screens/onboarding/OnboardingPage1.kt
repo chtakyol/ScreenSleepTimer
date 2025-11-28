@@ -2,8 +2,10 @@ package com.cihatakyol.sleeptimer.ui.screens.onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -17,9 +19,11 @@ fun OnboardingPage1(
     OnboardingPage(
         icon = {
             Image(
-                painter = painterResource(id = R.drawable.app_logo),
-                contentDescription = "App Icon",
-                modifier = Modifier.size(120.dp)
+                painter = painterResource(id = R.drawable.app_logo_square),
+                contentDescription = "Device Admin Icon",
+                modifier = Modifier
+                    .size(120.dp)
+                    .clip(RoundedCornerShape(16.dp))
             )
         },
         title = stringResource(R.string.onboarding_screen_1_title),
@@ -32,7 +36,5 @@ fun OnboardingPage1(
 @Preview
 @Composable
 private fun PreviewOnboardingScreen1() {
-    OnboardingPage1() {
-
-    }
+    OnboardingPage1 { }
 }

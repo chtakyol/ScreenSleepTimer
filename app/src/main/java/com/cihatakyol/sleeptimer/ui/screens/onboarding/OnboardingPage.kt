@@ -73,7 +73,7 @@ private fun PreviewOnboardingPage() {
     OnboardingPage(
         icon = {
             Image(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = painterResource(id = R.drawable.ic_notification),
                 contentDescription = "App Icon",
                 modifier = Modifier.size(120.dp)
             )

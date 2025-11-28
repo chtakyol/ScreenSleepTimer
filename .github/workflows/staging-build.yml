@@ -61,11 +61,11 @@ jobs:
 
       - name: Upload to Firebase App Distribution
         env:
-          FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
+          FIREBASE_APP_ID_STAGING: ${{ secrets.FIREBASE_APP_ID_STAGING }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
         run: |
           firebase appdistribution:distribute app/build/outputs/apk/staging/release/app-staging-release.apk \
-            --app "$FIREBASE_APP_ID" \
+            --app "$FIREBASE_APP_ID_STAGING" \
             --groups "internal-developers,beta-testers" \
             --release-notes "Staging build from commit ${{ github.sha }}: ${{ github.event.head_commit.message }}" \
             --token "$FIREBASE_TOKEN"

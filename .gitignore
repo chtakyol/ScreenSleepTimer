@@ -22,3 +22,5 @@ local.properties
 # Firebase configuration - Contains sensitive IDs
 google-services.json
 app/google-services.json
+app/google-services-dev.json
+app/google-services-staging.json

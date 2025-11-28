@@ -29,6 +29,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -130,16 +131,11 @@ fun OnboardingScreenContent(
     val pagerState = rememberPagerState(pageCount = { 3 })
     val coroutineScope = rememberCoroutineScope()
 
-    val gradientColors = listOf(
-        Color(0xFF1A1A1A), // Dark black
-        Color(0xFF2D1B69), // Deep purple
-        Color(0xFF1A1A1A)  // Dark black
-    )
     Box {
         HorizontalPager(
             state = pagerState,
             modifier = modifier
-                .background(brush = Brush.verticalGradient(colors = gradientColors))
+                .background(MaterialTheme.colorScheme.background)
                 .fillMaxSize()
         ) { page ->
             when (page) {
@@ -176,6 +172,10 @@ fun PagerIndicator(
     modifier: Modifier = Modifier,
     currentPage: Int
 ) {
+    // Use theme colors for pager indicator
+    val activeColor = MaterialTheme.colorScheme.primary
+    val inactiveColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -184,9 +184,9 @@ fun PagerIndicator(
     ) {
         repeat(3) { iteration ->
             val color = if (currentPage == iteration) {
-                Color.White
+                activeColor
             } else {
-                Color.White.copy(alpha = 0.3f)
+                inactiveColor
             }
 
             Box(

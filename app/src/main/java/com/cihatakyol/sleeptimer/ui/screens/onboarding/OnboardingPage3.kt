@@ -43,7 +43,7 @@ private fun OnboardingPage3NotificationPermissionAlreadyGiven(
     OnboardingPage(
         icon = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                painter = painterResource(id = R.drawable.ic_notification),
                 contentDescription = "Device Admin Icon",
                 modifier = Modifier.size(120.dp),
                 tint = MaterialTheme.colorScheme.onBackground

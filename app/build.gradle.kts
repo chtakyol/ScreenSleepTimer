@@ -43,6 +43,7 @@ android {
             buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
             buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"ca-app-pub-3940256099942544/9257395921\"")
             buildConfigField("String", "BUILD_ENVIRONMENT", "\"dev\"")
 
             // Manifest placeholders for AdMob
@@ -58,6 +59,7 @@ android {
             buildConfigField("String", "ADMOB_APP_ID", "\"ca-app-pub-3940256099942544~3347511713\"")
             buildConfigField("String", "ADMOB_BANNER_ID", "\"ca-app-pub-3940256099942544/6300978111\"")
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"ca-app-pub-3940256099942544/1033173712\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"ca-app-pub-3940256099942544/9257395921\"")
             buildConfigField("String", "BUILD_ENVIRONMENT", "\"staging\"")
 
             // Manifest placeholders for AdMob
@@ -68,14 +70,16 @@ android {
             dimension = "environment"
             // No suffix for production - uses base applicationId
 
-            // Production AdMob IDs from environment variables (set in CI) or default
+            // Production AdMob IDs from environment variables (set in CI) or default to test IDs
             val admobAppIdProd = System.getenv("ADMOB_APP_ID_PROD") ?: "ca-app-pub-3940256099942544~3347511713"
             val admobBannerIdProd = System.getenv("ADMOB_BANNER_ID_PROD") ?: "ca-app-pub-3940256099942544/6300978111"
             val admobInterstitialIdProd = System.getenv("ADMOB_INTERSTITIAL_ID_PROD") ?: "ca-app-pub-3940256099942544/1033173712"
+            val admobAppOpenIdProd = System.getenv("ADMOB_APP_OPEN_ID_PROD") ?: "ca-app-pub-3940256099942544/9257395921"
 
             buildConfigField("String", "ADMOB_APP_ID", "\"$admobAppIdProd\"")
             buildConfigField("String", "ADMOB_BANNER_ID", "\"$admobBannerIdProd\"")
             buildConfigField("String", "ADMOB_INTERSTITIAL_ID", "\"$admobInterstitialIdProd\"")
+            buildConfigField("String", "ADMOB_APP_OPEN_ID", "\"$admobAppOpenIdProd\"")
             buildConfigField("String", "BUILD_ENVIRONMENT", "\"production\"")
 
             // Manifest placeholders for AdMob
@@ -203,7 +207,7 @@ dependencies {
     implementation("com.google.accompanist:accompanist-permissions:0.32.0")
 
     // AdMob
-    implementation("com.google.android.gms:play-services-ads:22.6.0")
+    implementation("com.google.android.gms:play-services-ads:23.0.0")
 
     // Navigation
     implementation("androidx.navigation:navigation-compose:2.9.0")

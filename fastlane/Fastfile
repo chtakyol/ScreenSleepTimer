@@ -59,30 +59,8 @@ platform :android do
   end
 
   # ===============================
-  # Firebase App Distribution Lanes
+  # Note: Firebase App Distribution is handled directly via Firebase CLI in GitHub Actions
   # ===============================
-
-  desc "Distribute Dev build to Firebase App Distribution"
-  lane :distribute_dev do
-    firebase_app_distribution(
-      app: ENV["FIREBASE_APP_ID"],
-      apk_path: "app/build/outputs/apk/dev/debug/app-dev-debug.apk",
-      groups: "internal-developers",
-      release_notes: ENV["RELEASE_NOTES"] || "Dev build from CI/CD pipeline",
-      firebase_cli_token: ENV["FIREBASE_TOKEN"]
-    )
-  end
-
-  desc "Distribute Staging build to Firebase App Distribution"
-  lane :distribute_staging do
-    firebase_app_distribution(
-      app: ENV["FIREBASE_APP_ID"],
-      apk_path: "app/build/outputs/apk/staging/release/app-staging-release.apk",
-      groups: "internal-developers,beta-testers",
-      release_notes: ENV["RELEASE_NOTES"] || "Staging build from CI/CD pipeline",
-      firebase_cli_token: ENV["FIREBASE_TOKEN"]
-    )
-  end
 
   # ===============================
   # Google Play Console Lanes
@@ -102,20 +80,8 @@ platform :android do
   end
 
   # ===============================
-  # Combined Lanes (Build + Distribute)
+  # Combined Lanes (Build + Upload)
   # ===============================
-
-  desc "Build and distribute Dev build"
-  lane :dev_release do
-    build_dev
-    distribute_dev
-  end
-
-  desc "Build and distribute Staging build"
-  lane :staging_release do
-    build_staging
-    distribute_staging
-  end
 
   desc "Build and upload Production release to Play Store"
   lane :production_release do
@@ -144,14 +110,5 @@ platform :android do
   desc "Build debug APK"
   lane :build_debug do
     gradle(task: "assembleDebug")
-  end
-
-  desc "Deploy test version to Firebase (legacy)"
-  lane :upload_debug_apk_to_firebase do
-    firebase_app_distribution(
-      app: ENV["FIREBASE_APP_ID"],
-      apk_path: "./app-debug.apk",
-      firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"]
-    )
   end
 end

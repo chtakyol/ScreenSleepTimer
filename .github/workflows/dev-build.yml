@@ -44,21 +44,20 @@ jobs:
       - name: Build Dev Debug APK
         run: ./gradlew assembleDevDebug
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '3.2'
-          bundler-cache: true
-
-      - name: Install Fastlane dependencies
-        run: bundle install
+      - name: Install Firebase CLI
+        run: |
+          curl -sL https://firebase.tools | bash
 
       - name: Upload to Firebase App Distribution
         env:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_TOKEN: ${{ secrets.FIREBASE_TOKEN }}
-          RELEASE_NOTES: "Dev build from PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}"
-        run: bundle exec fastlane distribute_dev
+        run: |
+          firebase appdistribution:distribute app/build/outputs/apk/dev/debug/app-dev-debug.apk \
+            --app "$FIREBASE_APP_ID" \
+            --groups "internal-developers" \
+            --release-notes "Dev build from PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}" \
+            --token "$FIREBASE_TOKEN"
 
       - name: Upload test results
         if: always()

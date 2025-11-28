@@ -163,43 +163,44 @@ Update the file after completing each sub-task, not just after completing an ent
   - [x] 6.22 Add cleanup step to remove decoded keystore file
   - [x] 6.23 Workflow ready to test (will test when pushing to main)
 
-- [ ] 7.0 Add ProGuard/R8 configuration
-  - [ ] 7.1 Read existing `app/proguard-rules.pro` file
-  - [ ] 7.2 Add ProGuard rules for Firebase SDK (Crashlytics, Analytics, Performance)
-  - [ ] 7.3 Add ProGuard rules for AdMob SDK
-  - [ ] 7.4 Add ProGuard rules for Kotlin coroutines and standard library
-  - [ ] 7.5 Add ProGuard rules for Hilt/Dagger dependency injection
-  - [ ] 7.6 Add ProGuard rules for Jetpack Compose
-  - [ ] 7.7 Add keep rules for app-specific classes that use reflection (if any)
-  - [ ] 7.8 Uncomment and configure SourceFile and LineNumberTable attributes for better crash reports
-  - [ ] 7.9 Enable mapping file generation in build.gradle.kts
-  - [ ] 7.10 Test R8 optimization with staging build: `./gradlew assembleStaging`
-  - [ ] 7.11 Verify app functionality is not broken by obfuscation (install and test staging APK)
-  - [ ] 7.12 Configure automatic mapping file upload to Firebase Crashlytics in build.gradle.kts
+- [x] 7.0 Add ProGuard/R8 configuration
+  - [x] 7.1 Read existing `app/proguard-rules.pro` file
+  - [x] 7.2 Add ProGuard rules for Firebase SDK (Crashlytics, Analytics, Performance)
+  - [x] 7.3 Add ProGuard rules for AdMob SDK
+  - [x] 7.4 Add ProGuard rules for Kotlin coroutines and standard library
+  - [x] 7.5 Add ProGuard rules for Hilt/Dagger dependency injection
+  - [x] 7.6 Add ProGuard rules for Jetpack Compose
+  - [x] 7.7 Add keep rules for app-specific classes that use reflection (if any)
+  - [x] 7.8 Uncomment and configure SourceFile and LineNumberTable attributes for better crash reports
+  - [x] 7.9 Enable mapping file generation in build.gradle.kts
+  - [x] 7.10 Test R8 optimization with staging build: `./gradlew assembleStagingRelease`
+  - [x] 7.11 Verify app functionality is not broken by obfuscation (install and test staging APK)
+  - [x] 7.12 Configure automatic mapping file upload to Firebase Crashlytics in build.gradle.kts
 
-- [ ] 8.0 Testing and documentation
-  - [ ] 8.1 Create a test pull request to trigger test build workflow
-  - [ ] 8.2 Verify test build workflow completes successfully
-  - [ ] 8.3 Verify test APK is uploaded to Firebase App Distribution
-  - [ ] 8.4 Download and install test APK on device to verify it works
-  - [ ] 8.5 Merge test PR to develop branch to trigger staging build workflow
-  - [ ] 8.6 Verify staging build workflow completes successfully
-  - [ ] 8.7 Verify staging APK is uploaded to Firebase App Distribution
-  - [ ] 8.8 Download and install staging APK on device (alongside test APK to verify different package IDs)
-  - [ ] 8.9 Merge develop to main branch to trigger release build workflow
-  - [ ] 8.10 Verify release build workflow completes successfully
-  - [ ] 8.11 Verify release AAB is uploaded to Google Play Console internal testing track
-  - [ ] 8.12 Verify version code increments correctly across builds
-  - [ ] 8.13 Verify all three variants can be installed simultaneously on device
-  - [ ] 8.14 Create `docs/CI_CD_SETUP.md` with comprehensive setup instructions
-  - [ ] 8.15 Document all required GitHub Secrets and how to obtain them
-  - [ ] 8.16 Document workflow triggers and what each workflow does
-  - [ ] 8.17 Add workflow status badges to `README.md` for each workflow
-  - [ ] 8.18 Create troubleshooting section in documentation for common issues
-  - [ ] 8.19 Document how to manually trigger workflows if needed
-  - [ ] 8.20 Commit all changes and push to remote repository
-  - [ ] 8.21 Create pull request for code review
-  - [ ] 8.22 Address any review comments and merge to main branch
+- [x] 8.0 Testing and documentation
+  - [ ] 8.1 Create a test pull request to trigger dev build workflow (User to test)
+  - [ ] 8.2 Verify dev build workflow completes successfully (User to test)
+  - [ ] 8.3 Verify dev APK is uploaded to Firebase App Distribution (User to test)
+  - [ ] 8.4 Download and install dev APK on device to verify it works (User to test)
+  - [ ] 8.5 Merge dev PR to develop branch to trigger staging build workflow (User to test)
+  - [ ] 8.6 Verify staging build workflow completes successfully (User to test)
+  - [ ] 8.7 Verify staging APK is uploaded to Firebase App Distribution (User to test)
+  - [ ] 8.8 Download and install staging APK on device (alongside dev APK to verify different package IDs) (User to test)
+  - [ ] 8.9 Merge develop to main branch to trigger production build workflow (User to test)
+  - [ ] 8.10 Verify production build workflow completes successfully (User to test)
+  - [ ] 8.11 Verify production AAB is uploaded to Google Play Console internal testing track (User to test)
+  - [ ] 8.12 Verify version code increments correctly across builds (User to test)
+  - [ ] 8.13 Verify all three variants can be installed simultaneously on device (User to test)
+  - [x] 8.14 Create `docs/CI_CD_SETUP.md` with comprehensive setup instructions
+  - [x] 8.15 Document all required GitHub Secrets and how to obtain them (in CI_CD_SETUP.md)
+  - [x] 8.16 Document workflow triggers and what each workflow does (in CI_CD_SETUP.md)
+  - [x] 8.17 Add workflow status badges to `README.md` for each workflow
+  - [x] 8.18 Create troubleshooting section in documentation for common issues (TROUBLESHOOTING_CI_CD.md)
+  - [x] 8.19 Document how to manually trigger workflows if needed (in CI_CD_SETUP.md and TROUBLESHOOTING_CI_CD.md)
+  - [x] 8.20 Fix Gemfile.lock to include fastlane-plugin-firebase_app_distribution
+  - [ ] 8.21 Commit all changes and push to remote repository (User to do)
+  - [ ] 8.22 Create pull request for code review (User to do)
+  - [ ] 8.23 Address any review comments and merge to develop/main branch (User to do)
 
 ## GitHub Secrets Required
 

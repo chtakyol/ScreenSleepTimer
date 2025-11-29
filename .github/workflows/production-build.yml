@@ -45,6 +45,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Create keystores directory
+        run: mkdir -p keystores
+
       - name: Decode production keystore
         env:
           RELEASE_KEYSTORE_FILE: ${{ secrets.RELEASE_KEYSTORE_FILE }}

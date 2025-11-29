@@ -14,7 +14,7 @@ android {
     defaultConfig {
         applicationId = "com.ToolCompany.screentimer"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
 
         // Dynamic version code for CI/CD: base version + GitHub run number
         val baseVersionCode = 3

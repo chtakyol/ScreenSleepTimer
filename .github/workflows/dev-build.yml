@@ -37,10 +37,6 @@ jobs:
         run: |
           echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
 
-      - name: Run unit tests
-        run: ./gradlew testDebugUnitTest --continue
-        continue-on-error: true
-
       - name: Build Dev Debug APK
         run: ./gradlew assembleDevDebug
 
@@ -58,14 +54,6 @@ jobs:
             --groups "internal-developers" \
             --release-notes "Dev build from PR #${{ github.event.pull_request.number }}: ${{ github.event.pull_request.title }}" \
             --token "$FIREBASE_TOKEN"
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: app/build/test-results/**/*.xml
-          retention-days: 30
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4

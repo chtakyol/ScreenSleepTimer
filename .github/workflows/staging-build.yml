@@ -32,6 +32,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Create keystores directory
+        run: mkdir -p keystores
+
       - name: Decode staging keystore
         env:
           STAGING_KEYSTORE_FILE: ${{ secrets.STAGING_KEYSTORE_FILE }}

@@ -49,8 +49,12 @@ fun TimePicker(
             selectedIndex = hours.indexOf(currentHour),
             onValueSelected = { hour -> onTimeSelected(hour, currentMinute) }
         )
-
-        Text("h", color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            modifier = Modifier.padding(horizontal = 4.dp),
+            text = "h",
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 16.sp
+        )
 
         Spacer(modifier = Modifier.width(16.dp))
 
@@ -60,8 +64,12 @@ fun TimePicker(
             selectedIndex = minutes.indexOf(currentMinute),
             onValueSelected = { minute -> onTimeSelected(currentHour, minute) }
         )
-
-        Text("m", color = MaterialTheme.colorScheme.onSurface)
+        Text(
+            modifier = Modifier.padding(horizontal = 4.dp),
+            text = "m",
+            color = MaterialTheme.colorScheme.onSurface,
+            fontSize = 16.sp
+        )
     }
 }
 
@@ -111,7 +119,7 @@ fun SwipeSelector(
                 val isSelected = index == selectedIndex
                 Text(
                     text = values[index].toString().padStart(2, '0'),
-                    fontSize = if (isSelected) 28.sp else 18.sp,
+                    fontSize = if (isSelected) 40.sp else 18.sp,
                     color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -123,7 +131,7 @@ fun SwipeSelector(
         Box(
             modifier = Modifier
                 .align(Alignment.Center)
-                .height(48.dp)
+                .height(60.dp)
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.1f))
         )

@@ -1,78 +1,114 @@
 # This file contains the fastlane.tools configuration
 # You can find the documentation at https://docs.fastlane.tools
-#
-# For a list of all available actions, check out
-#
-#     https://docs.fastlane.tools/actions
-#
-# For a list of all available plugins, check out
-#
-#     https://docs.fastlane.tools/plugins/available-plugins
-#
-
-# Uncomment the line if you want fastlane to automatically update itself
-# update_fastlane
 
 default_platform(:android)
 
 platform :android do
-  desc "Runs all the tests"
-  lane :test do
-    gradle(task: "test")
-  end
 
-  desc "Submit a new Beta Build to Crashlytics Beta"
-  lane :beta do
-    gradle(task: "clean assembleRelease")
-    crashlytics
-  
-    # sh "your_script.sh"
-    # You can also use other beta testing services here
-  end
+  # ===============================
+  # Build Lanes
+  # ===============================
 
-  desc "Deploy a new version to the Google Play"
-  lane :deploy do
-    gradle(task: "clean assembleRelease")
-    upload_to_play_store
-  end
-
-  desc "Build debug APK"
-  lane :build_debug do
+  desc "Build Dev Debug APK"
+  lane :build_dev do
     gradle(
-      task: "assembleDebug"
+      task: "clean assembleDevDebug"
     )
   end
 
-  desc "Build and sign APK with the provided keystore"
-  lane :build_signed_apk do
-    UI.message("Fastlane working directory: #{Dir.pwd}")
-    UI.message("Keystore path: #{ENV['KEYSTORE_FILE']}")
-
-    sh <<~SH
-      echo "Absolute path:"
-      realpath "#{ENV['KEYSTORE_FILE']}" || echo "realpath failed"
-
-      echo "File details:"
-      ls -lh "#{ENV['KEYSTORE_FILE']}" || echo "File not found"
-    SH
-
+  desc "Build Staging Release APK"
+  lane :build_staging do
     gradle(
-      task: "clean assembleRelease",
+      task: "clean assembleStagingRelease",
       properties: {
-        "android.injected.signing.store.file" => ENV["KEYSTORE_FILE"],
-        "android.injected.signing.store.password" => ENV["KEYSTORE_PASSWORD"],
-        "android.injected.signing.key.alias" => ENV["KEY_ALIAS"],
-        "android.injected.signing.key.password" => ENV["KEY_PASSWORD"]
+        "STAGING_KEYSTORE_PASSWORD" => ENV["STAGING_KEYSTORE_PASSWORD"],
+        "STAGING_KEY_ALIAS" => ENV["STAGING_KEY_ALIAS"],
+        "STAGING_KEY_PASSWORD" => ENV["STAGING_KEY_PASSWORD"]
       }
     )
   end
 
-  desc "Deploy test version to Firebase"
-  lane :upload_debug_apk_to_firebase do
-    firebase_app_distribution(
-      app: ENV["FIREBASE_APP_ID"],
-      apk_path: "./app-debug.apk",
-      firebase_cli_token: ENV["FIREBASE_CLI_TOKEN"]
+  desc "Build Production Release AAB"
+  lane :build_production do
+    gradle(
+      task: "clean bundleProductionRelease",
+      properties: {
+        "RELEASE_KEYSTORE_PASSWORD" => ENV["RELEASE_KEYSTORE_PASSWORD"],
+        "RELEASE_KEY_ALIAS" => ENV["RELEASE_KEY_ALIAS"],
+        "RELEASE_KEY_PASSWORD" => ENV["RELEASE_KEY_PASSWORD"],
+        "ADMOB_APP_ID_PROD" => ENV["ADMOB_APP_ID_PROD"],
+        "ADMOB_BANNER_ID_PROD" => ENV["ADMOB_BANNER_ID_PROD"],
+        "ADMOB_INTERSTITIAL_ID_PROD" => ENV["ADMOB_INTERSTITIAL_ID_PROD"]
+      }
     )
+  end
+
+  desc "Build Production Release APK (for GitHub releases)"
+  lane :build_production_apk do
+    gradle(
+      task: "clean assembleProductionRelease",
+      properties: {
+        "RELEASE_KEYSTORE_PASSWORD" => ENV["RELEASE_KEYSTORE_PASSWORD"],
+        "RELEASE_KEY_ALIAS" => ENV["RELEASE_KEY_ALIAS"],
+        "RELEASE_KEY_PASSWORD" => ENV["RELEASE_KEY_PASSWORD"],
+        "ADMOB_APP_ID_PROD" => ENV["ADMOB_APP_ID_PROD"],
+        "ADMOB_BANNER_ID_PROD" => ENV["ADMOB_BANNER_ID_PROD"],
+        "ADMOB_INTERSTITIAL_ID_PROD" => ENV["ADMOB_INTERSTITIAL_ID_PROD"]
+      }
+    )
+  end
+
+  # ===============================
+  # Note: Firebase App Distribution is handled directly via Firebase CLI in GitHub Actions
+  # ===============================
+
+  # ===============================
+  # Google Play Console Lanes
+  # ===============================
+
+  desc "Upload Production AAB to Google Play Console (Internal Testing Track)"
+  lane :upload_to_play_store_internal do
+    upload_to_play_store(
+      track: 'internal',
+      aab: 'app/build/outputs/bundle/productionRelease/app-production-release.aab',
+      skip_upload_apk: true,
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true,
+      json_key_data: ENV["PLAY_STORE_SERVICE_ACCOUNT_JSON"]
+    )
+  end
+
+  # ===============================
+  # Combined Lanes (Build + Upload)
+  # ===============================
+
+  desc "Build and upload Production release to Play Store"
+  lane :production_release do
+    build_production
+    upload_to_play_store_internal
+  end
+
+  # ===============================
+  # Testing Lanes
+  # ===============================
+
+  desc "Run unit tests"
+  lane :test do
+    gradle(task: "testDebugUnitTest")
+  end
+
+  desc "Run unit tests for all variants"
+  lane :test_all do
+    gradle(task: "test")
+  end
+
+  # ===============================
+  # Legacy Lanes (kept for backward compatibility)
+  # ===============================
+
+  desc "Build debug APK"
+  lane :build_debug do
+    gradle(task: "assembleDebug")
   end
 end

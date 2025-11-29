@@ -8,20 +8,20 @@ plugins {
 }
 
 android {
-    namespace = "com.cihatakyol.sleeptimer"
+    namespace = "com.ToolCompany.screentimer"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.cihatakyol.sleeptimer"
+        applicationId = "com.ToolCompany.screentimer"
         minSdk = 26
         targetSdk = 34
 
         // Dynamic version code for CI/CD: base version + GitHub run number
-        val baseVersionCode = 1
+        val baseVersionCode = 3
         val ciRunNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 0
         versionCode = (baseVersionCode * 1000) + ciRunNumber
 
-        versionName = "1.0.0"
+        versionName = "3.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

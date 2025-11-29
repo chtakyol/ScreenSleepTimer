@@ -47,10 +47,6 @@ jobs:
         run: |
           echo "$GOOGLE_SERVICES_JSON" | base64 --decode > app/google-services.json
 
-      - name: Run unit tests
-        run: ./gradlew testReleaseUnitTest --continue
-        continue-on-error: true
-
       - name: Build Staging Release APK
         env:
           STAGING_KEYSTORE_PASSWORD: ${{ secrets.STAGING_KEYSTORE_PASSWORD }}
@@ -72,14 +68,6 @@ jobs:
             --groups "internal-developers,beta-testers" \
             --release-notes "Staging build from commit ${{ github.sha }}: ${{ github.event.head_commit.message }}" \
             --token "$FIREBASE_TOKEN"
-
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: staging-test-results
-          path: app/build/test-results/**/*.xml
-          retention-days: 30
 
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4

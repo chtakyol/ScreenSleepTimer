@@ -8,4 +8,5 @@
     <string name="onboarding_screen_1_title">Welcome to Sleep Timer</string>
     <string name="onboarding_screen_1_message">Sleep Timer helps you fall asleep by automatically turning off your screen after a set time. Perfect for bedtime reading or listening to music.</string>
     <string name="onboarding_screen_1_button">Continue</string>
+    <string name="fgs_special_use_explanation">This app uses a foreground service to run a user-initiated countdown timer that locks the device screen when the timer completes. The service displays an ongoing notification showing the remaining time and must run continuously to accurately track the countdown and execute the screen lock action at the specified time.</string>
 </resources>

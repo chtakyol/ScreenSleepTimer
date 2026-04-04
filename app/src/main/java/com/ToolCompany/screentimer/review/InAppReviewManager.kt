@@ -80,7 +80,7 @@ class InAppReviewManager @Inject constructor(
         val launchCount = userPreferences.appLaunchCount.first()
         val reviewRequested = userPreferences.reviewRequested.first()
 
-        return launchCount == LAUNCH_COUNT_THRESHOLD && !reviewRequested
+        return launchCount >= LAUNCH_COUNT_THRESHOLD && !reviewRequested
     }
 
     private suspend fun markReviewRequested() {

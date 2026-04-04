@@ -26,14 +26,17 @@ class MainActivity : ComponentActivity() {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        // Handle in-app review logic
-        lifecycleScope.launch {
-            inAppReviewManager.incrementLaunchCount()
-            inAppReviewManager.requestReviewIfNeeded(this@MainActivity)
+        // Handle in-app review logic (only on fresh launch, not config changes)
+        if (savedInstanceState == null) {
+            lifecycleScope.launch {
+                inAppReviewManager.incrementLaunchCount()
+                inAppReviewManager.requestReviewIfNeeded(this@MainActivity)
+                // Show app open ad after review flow completes to avoid UI conflicts
+                AppOpenAdManager.showAdIfAvailable(this@MainActivity)
+            }
+        } else {
+            AppOpenAdManager.showAdIfAvailable(this)
         }
-
-        // Show app open ad on cold start (frequency cap handled by AppOpenAdManager)
-        AppOpenAdManager.showAdIfAvailable(this)
 
         var keepSplashScreen = true
         splashScreen.setKeepOnScreenCondition { keepSplashScreen }

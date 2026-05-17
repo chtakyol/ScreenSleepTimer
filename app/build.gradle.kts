@@ -17,11 +17,11 @@ android {
         targetSdk = 35
 
         // Dynamic version code for CI/CD: base version + GitHub run number
-        val baseVersionCode = 4
+        val baseVersionCode = 5
         val ciRunNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 0
         versionCode = (baseVersionCode * 1000) + ciRunNumber
 
-        versionName = "3.1"
+        versionName = "3.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

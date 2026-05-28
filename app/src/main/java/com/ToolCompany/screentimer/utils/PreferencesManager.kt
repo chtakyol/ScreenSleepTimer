@@ -30,8 +30,32 @@ class PreferencesManager @Inject constructor(
         sharedPreferences.edit().putBoolean(KEY_COMPLETED_ONBOARDING, completed).apply()
     }
 
+    fun saveTimerState(endTime: Long) {
+        sharedPreferences.edit()
+            .putLong(KEY_TIMER_END_TIME, endTime)
+            .putBoolean(KEY_TIMER_ACTIVE, true)
+            .apply()
+    }
+
+    fun isTimerActive(): Boolean {
+        return sharedPreferences.getBoolean(KEY_TIMER_ACTIVE, false)
+    }
+
+    fun getTimerEndTime(): Long {
+        return sharedPreferences.getLong(KEY_TIMER_END_TIME, 0L)
+    }
+
+    fun clearTimerState() {
+        sharedPreferences.edit()
+            .remove(KEY_TIMER_END_TIME)
+            .remove(KEY_TIMER_ACTIVE)
+            .apply()
+    }
+
     companion object {
-        private const val PREFS_NAME = "SleepTimerPrefs"
+        const val PREFS_NAME = "SleepTimerPrefs"
+        const val KEY_TIMER_END_TIME = "timer_end_time"
+        const val KEY_TIMER_ACTIVE = "timer_active"
         private const val KEY_LAST_DURATION = "last_duration"
         private const val KEY_COMPLETED_ONBOARDING = "completed_onboarding"
         private const val DEFAULT_DURATION = 0

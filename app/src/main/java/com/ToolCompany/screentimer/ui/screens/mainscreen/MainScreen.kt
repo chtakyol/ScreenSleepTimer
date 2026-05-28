@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayCircle
 import androidx.compose.material.icons.filled.StopCircle
@@ -42,7 +43,11 @@ fun MainScreen(
 
     Scaffold(
         bottomBar = {
-            AdMobBanner()
+            AdMobBanner(
+                Modifier
+                    .systemBarsPadding()
+                    .padding(bottom = 32.dp)
+            )
         }
     ) { paddingValues ->
         Box(

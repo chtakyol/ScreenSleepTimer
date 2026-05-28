@@ -3,24 +3,18 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.BIND_DEVICE_ADMIN" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
-    <uses-permission android:name="com.ToolCompany.screentimer.permission.RECEIVE_COUNTDOWN" />
+    <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"
+        tools:ignore="ProtectedPermissions" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
 
-    <!-- Declare foreground service type for Play Console -->
     <uses-feature
         android:name="android.software.leanback"
         android:required="false" />
     <uses-feature
         android:name="android.hardware.touchscreen"
         android:required="false" />
-
-    <permission
-        android:name="com.ToolCompany.screentimer.permission.RECEIVE_COUNTDOWN"
-        android:protectionLevel="signature" />
 
     <application
         android:name=".SleepTimerApplication"
@@ -54,25 +48,8 @@
         </receiver>
 
         <receiver
-            android:name=".receiver.CountdownReceiver"
-            android:exported="false"
-            android:permission="com.ToolCompany.screentimer.permission.RECEIVE_COUNTDOWN">
-            <intent-filter>
-                <action android:name="com.ToolCompany.screentimer.COUNTDOWN_UPDATE" />
-            </intent-filter>
-        </receiver>
-
-        <service
-            android:name=".service.SleepTimerForegroundService"
-            android:exported="false"
-            android:foregroundServiceType="specialUse">
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
-                android:value="timer" />
-            <property
-                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE_EXPLANATION"
-                android:resource="@string/fgs_special_use_explanation" />
-        </service>
+            android:name=".receiver.LockScreenReceiver"
+            android:exported="false" />
 
         <activity
             android:name=".MainActivity"

@@ -5,7 +5,8 @@ import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import com.ToolCompany.screentimer.utils.PreferencesManager
+import com.ToolCompany.screentimer.utils.TimerNotificationHelper
+import com.ToolCompany.screentimer.utils.TimerScheduler
 
 class LockScreenReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
@@ -15,10 +16,7 @@ class LockScreenReceiver : BroadcastReceiver() {
             devicePolicyManager.lockNow()
         }
 
-        val prefs = context.getSharedPreferences(PreferencesManager.PREFS_NAME, Context.MODE_PRIVATE)
-        prefs.edit()
-            .remove(PreferencesManager.KEY_TIMER_END_TIME)
-            .remove(PreferencesManager.KEY_TIMER_ACTIVE)
-            .apply()
+        TimerScheduler.instance.cancelTimer()
+        TimerNotificationHelper.instance.cancelNotification()
     }
 }

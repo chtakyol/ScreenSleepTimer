@@ -1,6 +1,10 @@
 package com.ToolCompany.screentimer.ui.screens.mainscreen
 
+import android.Manifest
+import android.os.Build
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.tween
@@ -32,14 +36,18 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ToolCompany.screentimer.ui.components.AdMobBanner
 import com.ToolCompany.screentimer.ui.screens.mainscreen.components.TimePicker
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
-@OptIn(ExperimentalPermissionsApi::class)
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = hiltViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) {
+        viewModel.onStartClick()
+    }
 
     Scaffold(
         bottomBar = {
@@ -63,7 +71,17 @@ fun MainScreen(
                     currentMinute = displayTime.minute,
                     isActive = isCountdownActive,
                     onTimeSelected = viewModel::onTimeSelected,
-                    onStartToggle = viewModel::onToggleClick
+                    onStartToggle = {
+                        if (isCountdownActive) {
+                            viewModel.onStopClick()
+                        } else {
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                            } else {
+                                viewModel.onStartClick()
+                            }
+                        }
+                    }
                 )
             }
         }

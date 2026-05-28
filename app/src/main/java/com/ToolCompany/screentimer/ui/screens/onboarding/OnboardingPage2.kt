@@ -34,7 +34,6 @@ fun OnboardingPage2(
     } else {
         OnboardingPage2DeviceAdminAlreadyEnabled(onContinueButtonClick = onContinueButtonClick)
     }
-
 }
 
 @Composable

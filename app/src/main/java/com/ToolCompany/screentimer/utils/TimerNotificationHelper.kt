@@ -2,34 +2,39 @@ package com.ToolCompany.screentimer.utils
 
 import android.app.Notification
 import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.ToolCompany.screentimer.MainActivity
 import com.ToolCompany.screentimer.R
-import com.ToolCompany.screentimer.service.SleepTimerForegroundService
+import com.ToolCompany.screentimer.receiver.StopTimerReceiver
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class NotificationManager @Inject constructor(
+class TimerNotificationHelper @Inject constructor(
     @ApplicationContext private val context: Context,
     private val timeFormatter: TimeFormatter
 ) {
-    private val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val notificationManager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
 
     companion object {
         const val NOTIFICATION_ID = 1
         private const val CHANNEL_ID = "sleep_timer_channel"
         private const val CHANNEL_NAME = "Sleep Timer"
         private const val CHANNEL_DESCRIPTION = "Shows the countdown for sleep timer"
+
+        lateinit var instance: TimerNotificationHelper
+            private set
     }
 
     init {
+        instance = this
         createNotificationChannel()
     }
 
@@ -37,19 +42,32 @@ class NotificationManager @Inject constructor(
         val channel = NotificationChannel(
             CHANNEL_ID,
             CHANNEL_NAME,
-            NotificationManager.IMPORTANCE_HIGH
+            android.app.NotificationManager.IMPORTANCE_LOW
         ).apply {
             description = CHANNEL_DESCRIPTION
-            enableLights(true)
+            enableLights(false)
             enableVibration(false)
-            setShowBadge(true)
+            setShowBadge(false)
             setSound(null, null)
         }
         notificationManager.createNotificationChannel(channel)
     }
 
-    fun createCountdownNotification(remainingTime: Long): Notification {
-        // PendingIntent to open MainActivity when the notification is clicked
+    fun showNotification(remainingTime: Long) {
+        if (!hasNotificationPermission()) return
+        notificationManager.notify(NOTIFICATION_ID, buildNotification(remainingTime))
+    }
+
+    fun updateNotification(remainingTime: Long) {
+        if (!hasNotificationPermission()) return
+        notificationManager.notify(NOTIFICATION_ID, buildNotification(remainingTime))
+    }
+
+    fun cancelNotification() {
+        notificationManager.cancel(NOTIFICATION_ID)
+    }
+
+    private fun buildNotification(remainingTime: Long): Notification {
         val openAppIntent = Intent(context, MainActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
@@ -60,23 +78,10 @@ class NotificationManager @Inject constructor(
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
 
-        // PendingIntent for "Extend Time" action (still points to service)
-        val extendTimeIntent = Intent(context, SleepTimerForegroundService::class.java).apply {
-            action = SleepTimerForegroundService.ACTION_EXTEND_TIME
-            putExtra(SleepTimerForegroundService.EXTRA_EXTEND_TIME, 5000L) // 5 seconds
+        val stopIntent = Intent(context, StopTimerReceiver::class.java).apply {
+            action = StopTimerReceiver.ACTION_STOP
         }
-        val extendTimePendingIntent = PendingIntent.getService(
-            context,
-            1,
-            extendTimeIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        // PendingIntent for "Stop" action (still points to service)
-        val stopIntent = Intent(context, SleepTimerForegroundService::class.java).apply {
-            action = SleepTimerForegroundService.ACTION_STOP
-        }
-        val stopPendingIntent = PendingIntent.getService(
+        val stopPendingIntent = PendingIntent.getBroadcast(
             context,
             2,
             stopIntent,
@@ -87,33 +92,27 @@ class NotificationManager @Inject constructor(
             .setSmallIcon(R.drawable.ic_notification)
             .setContentTitle(context.getString(R.string.app_name))
             .setContentText(timeFormatter.formatTime(remainingTime))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setCategory(NotificationCompat.CATEGORY_SERVICE)
+            .setPriority(NotificationCompat.PRIORITY_LOW)
+            .setCategory(NotificationCompat.CATEGORY_ALARM)
             .setOngoing(true)
             .setAutoCancel(false)
             .setOnlyAlertOnce(true)
             .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-            .setColor(context.getColor(R.color.purple_500))
             .setContentIntent(openAppPendingIntent)
             .addAction(
                 R.drawable.ic_notification,
-                context.getString(R.string.extend_time),
-                extendTimePendingIntent
-            )
-            .addAction(
-                R.drawable.ic_notification,
-                "Stop",
+                context.getString(R.string.stop_timer),
                 stopPendingIntent
             )
-            .setForegroundServiceBehavior(NotificationCompat.FOREGROUND_SERVICE_IMMEDIATE)
             .build()
     }
 
-    fun updateNotification(remainingTime: Long) {
-        notificationManager.notify(NOTIFICATION_ID, createCountdownNotification(remainingTime))
+    private fun hasNotificationPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            context.checkSelfPermission(android.Manifest.permission.POST_NOTIFICATIONS) ==
+                    PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
     }
-
-    fun cancelNotification() {
-        notificationManager.cancel(NOTIFICATION_ID)
-    }
-} 
+}

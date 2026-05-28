@@ -3,9 +3,10 @@ package com.ToolCompany.screentimer.ui.screens.mainscreen
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ToolCompany.screentimer.data.repository.TimerSettingsRepository
-import com.ToolCompany.screentimer.receiver.CountdownReceiver
-import com.ToolCompany.screentimer.utils.ServiceManager
+import com.ToolCompany.screentimer.utils.ScreenManager
 import com.ToolCompany.screentimer.utils.TimeFormatter
+import com.ToolCompany.screentimer.utils.TimerNotificationHelper
+import com.ToolCompany.screentimer.utils.TimerScheduler
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -18,17 +19,42 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val serviceManager: ServiceManager,
+    private val timerScheduler: TimerScheduler,
+    private val screenManager: ScreenManager,
     private val timeFormatter: TimeFormatter,
     private val timerSettingsRepository: TimerSettingsRepository,
+    private val notificationHelper: TimerNotificationHelper,
 ) : ViewModel() {
     private val _state = MutableStateFlow(MainScreenUIState())
     val state: StateFlow<MainScreenUIState> = _state.asStateFlow()
 
+    private var countdownJob: Job? = null
+
     init {
-        setupCountdownReceiver()
-        observeServiceState()
+        restoreTimerIfNeeded()
         loadLastDuration()
+        observeExternalTimerStop()
+    }
+
+    private fun restoreTimerIfNeeded() {
+        val remaining = timerScheduler.getRemainingTime()
+        if (remaining > 0) {
+            _state.update { it.copy(isCountdownActive = true) }
+            startCountdownFlow(remaining)
+        }
+    }
+
+    private fun observeExternalTimerStop() {
+        viewModelScope.launch {
+            timerScheduler.isTimerRunning.collect { isRunning ->
+                if (!isRunning && _state.value.isCountdownActive) {
+                    countdownJob?.cancel()
+                    countdownJob = null
+                    _state.update { it.copy(isCountdownActive = false) }
+                    restoreLastDurationDisplay()
+                }
+            }
+        }
     }
 
     private fun loadLastDuration() {
@@ -40,36 +66,6 @@ class MainViewModel @Inject constructor(
                         displayTime = DisplayTime(
                             hour = timeFormatter.parseFromMillis(settings.lastSetDurationByUser).first,
                             minute = timeFormatter.parseFromMillis(settings.lastSetDurationByUser).second
-                        )
-                    )
-                }
-            }
-        }
-    }
-
-    private fun observeServiceState() {
-        viewModelScope.launch {
-            serviceManager.isServiceRunning.collect { isRunning ->
-                _state.update { currentState ->
-                    currentState.copy(
-                        isCountdownActive = isRunning,
-                    )
-                }
-                if (!isRunning) {
-                    stopCountdown()
-                }
-            }
-        }
-    }
-
-    private fun setupCountdownReceiver() {
-        CountdownReceiver.onCountdownUpdate = { remainingTime, isActive ->
-            if (isActive) {
-                _state.update { currentState ->
-                    currentState.copy(
-                        displayTime = DisplayTime(
-                            hour = timeFormatter.parseFromMillis(remainingTime).first,
-                            minute = timeFormatter.parseFromMillis(remainingTime).second
                         )
                     )
                 }
@@ -104,11 +100,15 @@ class MainViewModel @Inject constructor(
     }
 
     fun onStopClick() {
-        stopCountdown()
+        countdownJob?.cancel()
+        countdownJob = null
+        timerScheduler.cancelTimer()
+        notificationHelper.cancelNotification()
+        _state.update { it.copy(isCountdownActive = false) }
+        restoreLastDurationDisplay()
     }
 
-    private fun stopCountdown() {
-        serviceManager.stopTimer()
+    private fun restoreLastDurationDisplay() {
         viewModelScope.launch {
             val settings = timerSettingsRepository.getTimerSettings()
             _state.update { currentState ->
@@ -123,13 +123,38 @@ class MainViewModel @Inject constructor(
     }
 
     private fun startCountdown() {
-        serviceManager.startTimer(state.value.selectedDurationInMillis)
+        timerScheduler.scheduleTimer(state.value.selectedDurationInMillis)
+        _state.update { it.copy(isCountdownActive = true) }
+        notificationHelper.showNotification(state.value.selectedDurationInMillis)
+        startCountdownFlow(state.value.selectedDurationInMillis)
     }
 
-
-    override fun onCleared() {
-        super.onCleared()
-        CountdownReceiver.onCountdownUpdate = null
+    private fun startCountdownFlow(durationMillis: Long) {
+        countdownJob?.cancel()
+        val endTime = System.currentTimeMillis() + durationMillis
+        countdownJob = viewModelScope.launch {
+            while (true) {
+                val remaining = endTime - System.currentTimeMillis()
+                if (remaining <= 0) {
+                    screenManager.lockScreen()
+                    timerScheduler.cancelTimer()
+                    notificationHelper.cancelNotification()
+                    _state.update { it.copy(isCountdownActive = false) }
+                    restoreLastDurationDisplay()
+                    break
+                }
+                notificationHelper.updateNotification(remaining)
+                _state.update { currentState ->
+                    currentState.copy(
+                        displayTime = DisplayTime(
+                            hour = timeFormatter.parseFromMillis(remaining).first,
+                            minute = timeFormatter.parseFromMillis(remaining).second
+                        )
+                    )
+                }
+                delay(1000)
+            }
+        }
     }
 }
 

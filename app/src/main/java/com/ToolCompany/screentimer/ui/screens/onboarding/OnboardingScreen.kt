@@ -1,11 +1,9 @@
 package com.ToolCompany.screentimer.ui.screens.onboarding
 
-import android.Manifest
 import android.app.admin.DevicePolicyManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -30,20 +28,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.BottomCenter
 import androidx.compose.ui.Modifier
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.ToolCompany.screentimer.R
 import com.ToolCompany.screentimer.receiver.SleepTimerDeviceAdmin
-import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalPermissionsApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnboardingScreen(
     viewModel: OnboardingViewModel = hiltViewModel(),
@@ -53,36 +45,20 @@ fun OnboardingScreen(
 
     val deviceAdminEnabled = remember { mutableStateOf(false) }
 
-    // Device Admin permission
     val deviceAdminLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.StartActivityForResult()
-    ) { result ->
-        // Check if device admin was granted
+    ) { _ ->
         val devicePolicyManager =
             context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         val componentName = ComponentName(context, SleepTimerDeviceAdmin::class.java)
         deviceAdminEnabled.value = devicePolicyManager.isAdminActive(componentName)
     }
 
-    // Notification permission
-    val notificationPermissionState = rememberPermissionState(
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.POST_NOTIFICATIONS
-        } else {
-            ""
-        }
-    )
-
-    // Check if all permissions are granted
-    LaunchedEffect(notificationPermissionState.status.isGranted) {
+    LaunchedEffect(deviceAdminEnabled.value) {
         val devicePolicyManager =
             context.getSystemService(Context.DEVICE_POLICY_SERVICE) as DevicePolicyManager
         val componentName = ComponentName(context, SleepTimerDeviceAdmin::class.java)
-        val isDeviceAdminActive = devicePolicyManager.isAdminActive(componentName)
-
-        if (isDeviceAdminActive &&
-            (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU || notificationPermissionState.status.isGranted)
-        ) {
+        if (devicePolicyManager.isAdminActive(componentName)) {
             viewModel.completeOnboarding()
         }
     }
@@ -90,7 +66,6 @@ fun OnboardingScreen(
     OnboardingScreenContent(
         modifier = Modifier,
         isDeviceAdminEnabled = deviceAdminEnabled.value,
-        isNotificationPermissionGiven = notificationPermissionState.status.isGranted,
         onRequestDeviceAdminButtonClick = {
             val intent = Intent(DevicePolicyManager.ACTION_ADD_DEVICE_ADMIN).apply {
                 putExtra(
@@ -104,13 +79,6 @@ fun OnboardingScreen(
             }
             deviceAdminLauncher.launch(intent)
         },
-        onNotificationPermissionRequestButtonClick = {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                notificationPermissionState.launchPermissionRequest()
-            } else {
-                viewModel.completeOnboarding()
-            }
-        },
         onOnboardingDone = {
             viewModel.completeOnboarding()
             navigateToMainScreen()
@@ -123,12 +91,10 @@ fun OnboardingScreen(
 fun OnboardingScreenContent(
     modifier: Modifier = Modifier,
     isDeviceAdminEnabled: Boolean = false,
-    isNotificationPermissionGiven: Boolean = false,
     onRequestDeviceAdminButtonClick: () -> Unit,
-    onNotificationPermissionRequestButtonClick: () -> Unit,
     onOnboardingDone: () -> Unit
 ) {
-    val pagerState = rememberPagerState(pageCount = { 3 })
+    val pagerState = rememberPagerState(pageCount = { 2 })
     val coroutineScope = rememberCoroutineScope()
 
     Box {
@@ -146,23 +112,14 @@ fun OnboardingScreenContent(
                 1 -> OnboardingPage2(
                     isDeviceAdminEnabled = isDeviceAdminEnabled,
                     onRequestDeviceAdmin = onRequestDeviceAdminButtonClick,
-                    onContinueButtonClick = {
-                        coroutineScope.launch {
-                            pagerState.animateScrollToPage(2)
-                        }
-                    }
-                )
-
-                2 -> OnboardingPage3(
-                    isNotificationPermissionGiven = isNotificationPermissionGiven,
-                    onRequestNotificationPermission = onNotificationPermissionRequestButtonClick,
-                    onContinueButtonClick =onOnboardingDone
+                    onContinueButtonClick = onOnboardingDone
                 )
             }
         }
         PagerIndicator(
             modifier = Modifier.align(BottomCenter),
-            currentPage = pagerState.currentPage
+            currentPage = pagerState.currentPage,
+            pageCount = 2
         )
     }
 }
@@ -170,9 +127,9 @@ fun OnboardingScreenContent(
 @Composable
 fun PagerIndicator(
     modifier: Modifier = Modifier,
-    currentPage: Int
+    currentPage: Int,
+    pageCount: Int = 2
 ) {
-    // Use theme colors for pager indicator
     val activeColor = MaterialTheme.colorScheme.primary
     val inactiveColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
 
@@ -182,7 +139,7 @@ fun PagerIndicator(
             .padding(bottom = 16.dp),
         horizontalArrangement = Arrangement.Center
     ) {
-        repeat(3) { iteration ->
+        repeat(pageCount) { iteration ->
             val color = if (currentPage == iteration) {
                 activeColor
             } else {
@@ -197,22 +154,9 @@ fun PagerIndicator(
                     .background(color)
             )
 
-            if (iteration < 2) {
+            if (iteration < pageCount - 1) {
                 Spacer(modifier = Modifier.width(8.dp))
             }
         }
     }
-}
-
-@Preview
-@Composable
-private fun PreviewOnboardingScreen() {
-    OnboardingScreenContent(
-        modifier = Modifier,
-        onRequestDeviceAdminButtonClick = { },
-        onNotificationPermissionRequestButtonClick = { },
-        isDeviceAdminEnabled = false,
-        isNotificationPermissionGiven = false,
-        onOnboardingDone = {  }
-    )
 }

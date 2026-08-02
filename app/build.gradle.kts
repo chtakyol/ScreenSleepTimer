@@ -9,19 +9,19 @@ plugins {
 
 android {
     namespace = "com.ToolCompany.screentimer"
-    compileSdk = 35
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.ToolCompany.screentimer"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 37
 
         // Dynamic version code for CI/CD: base version + GitHub run number
         val baseVersionCode = 5
         val ciRunNumber = System.getenv("GITHUB_RUN_NUMBER")?.toIntOrNull() ?: 0
         versionCode = (baseVersionCode * 1000) + ciRunNumber
 
-        versionName = "4.0"
+        versionName = "4.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
